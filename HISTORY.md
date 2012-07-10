@@ -1,5 +1,9 @@
 # clj-ml History
 
+## v0.2.4 - 2012-07-09
+
+ * More Maven appeasement....
+
 ## v0.2.3 - 2012-07-06
 
  * Use new RELEASE version of Incanter now that its available.
