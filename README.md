@@ -16,7 +16,7 @@ git clone the project, then run:
 
 ### Installing from Clojars
 
-    [cc.artifice/clj-ml "0.3.2"]
+    [cc.artifice/clj-ml "0.3.3"]
 
 ### Installing from Maven
 
@@ -25,7 +25,7 @@ git clone the project, then run:
     <dependency>
       <groupId>cc.artifice</groupId>
       <artifactId>clj-ml</artifactId>
-      <version>0.3.2</version>
+      <version>0.3.3</version>
     </dependency>
 
 ## Supported algorithms
@@ -37,7 +37,7 @@ git clone the project, then run:
    * unsupervised nominal to binary
    * string to word vector
    * reorder attributes
-   * resample
+   * resample (supervised, unsupervised)
 
  * Classifiers
    * C4.5 (J4.8)
