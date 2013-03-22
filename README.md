@@ -16,7 +16,7 @@ git clone the project, then run:
 
 ### Installing from Clojars
 
-    [cc.artifice/clj-ml "0.3.0"]
+    [cc.artifice/clj-ml "0.3.1"]
 
 ### Installing from Maven
 
@@ -25,7 +25,7 @@ git clone the project, then run:
     <dependency>
       <groupId>cc.artifice</groupId>
       <artifactId>clj-ml</artifactId>
-      <version>0.3.0</version>
+      <version>0.3.1</version>
     </dependency>
 
 ## Supported algorithms
