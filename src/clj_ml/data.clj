@@ -172,7 +172,8 @@
                                     vfa (reduce (fn [a i] (.addElement a (name i)) a)
                                                 (new FastVector) v)]
                                 (new Attribute (name (first (keys att))) vfa))
-                              (new Attribute (name (first (keys att))) (first (vals att))))
+                              (let [^weka.core.FastVector tmp (first (vals att))]
+                                (new Attribute (name (first (keys att))) tmp)))
                             (new Attribute (name att)))))
            (recur (rest atts)
                   fv))))))

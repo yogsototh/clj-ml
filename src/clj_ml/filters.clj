@@ -120,6 +120,27 @@
 
 (deffilter numeric-to-nominal)
 
+(defmethod make-filter-options :string-to-word-vector
+  ([kind m]
+     (->> (extract-attributes m)
+          (check-options m {:counts "-C"
+                            :invert "-V"
+                            :transform-tf "-T"
+                            :transform-idf "-I"
+                            :lowercase "-L"
+                            :use-stoplist "-S"
+                            :constrain-globally "-O"})
+          (check-option-values m {:prefix "-P"
+                                  :words-to-keep "-W"
+                                  :prune-rate "-prune-rate"
+                                  :normalize "-N"
+                                  :stemmer "-stemmer"
+                                  :min-freq "-M"
+                                  :stopwords-file "-stopwords"
+                                  :tokenizer "-tokenizer"}))))
+
+(deffilter string-to-word-vector)
+
 (def attribute-types
   "Mapping of Weka's attribute types from clj-ml keywords to the -T flag's representation."
   {:numeric "NUM" :nominal "NOM" :string "STR" :date "DAT"})
@@ -195,6 +216,7 @@
    :supervised-nominal-to-binary weka.filters.supervised.attribute.NominalToBinary
    :unsupervised-nominal-to-binary weka.filters.unsupervised.attribute.NominalToBinary
    :numeric-to-nominal weka.filters.unsupervised.attribute.NumericToNominal
+   :string-to-word-vector weka.filters.unsupervised.attribute.StringToWordVector
    :add-attribute weka.filters.unsupervised.attribute.Add
    :remove-attributes weka.filters.unsupervised.attribute.Remove
    :remove-percentage weka.filters.unsupervised.instance.RemovePercentage
@@ -215,6 +237,7 @@
      - :supervised-nominal-to-binary
      - :unsupervised-nominal-to-binary
      - :numeric-to-nominal
+     - :string-to-word-vector
      - :add-attribute
      - :remove-attributes
      - :remove-percentage
@@ -333,6 +356,10 @@
             The attributes may also be specified by names as well: [:some-name, \"another-name\"]
         - :invert
             Invert the selection of the columns. Sample value: true
+
+    * :string-to-word-vector
+
+      TODO
 
     * :add-attribute
 

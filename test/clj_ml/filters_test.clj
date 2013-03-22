@@ -24,6 +24,11 @@
     (let [options (make-filter-options :unsupervised-nominal-to-binary {:attributes [1,2] :also-binary true :for-each-nominal true :invert true})]
       options => (just ["-R" "2,3" "-V" "-N" "-A"] :in-any-order))))
 
+(deftest make-filter-options-string-to-word-vector
+  (fact
+   (let [options (make-filter-options :string-to-word-vector {:attributes [1] :lowercase true :counts false :words-to-keep 20 :transform-idf true})]
+     options => (just ["-R" "2" "-L" "-W" "20" "-I"] :in-any-order))))
+
 (deftest make-filter-remove-useless-attributes
   (let [ds (make-dataset :foo [:a] [[1] [2]])
         filter (make-filter :remove-useless-attributes {:dataset-format ds :max-variance 95})]
@@ -65,6 +70,13 @@
                                        [4 5 :g]])
         f (make-filter :unsupervised-nominal-to-binary {:dataset-format ds :attributes [2]})]
     (is (= weka.filters.unsupervised.attribute.NominalToBinary
+           (class f)))))
+
+(deftest make-filter-string-to-word-vector
+  (let [ds (make-dataset :test [{:s nil} {:class [:yes :no]}]
+                         [["Hello, world!" :no] ["This is a test, is a world." :yes]])
+        f (make-filter :string-to-word-vector {:dataset-format ds :attributes [0]})]
+    (is (= weka.filters.unsupervised.attribute.StringToWordVector
            (class f)))))
 
 (deftest make-filter-remove-attributes
@@ -120,7 +132,16 @@
        (is (= (dataset-format  (make-apply-filter :numeric-to-nominal {:attributes [:b]} ds))
               [:a {:b '(:2 :3 :5)} {:c '(:g :m)}])))))
 
-
+(deftest make-apply-filter-string-to-word-vector
+  (let [ds (make-dataset :test [{:s nil} {:class [:yes :no]}]
+                         [["Hello, world!" :no]
+                          ["This is a test, is a world." :yes]])]
+    (is (= (map instance-to-map
+              (dataset-seq (make-apply-filter :string-to-word-vector
+                                              {:attributes [0] :counts true :lowercase true}
+                                              ds)))
+           '({:hello 1.0, :a 0.0, :class "no"}
+             {:test 1.0, :is 2.0, :hello 0.0, :a 2.0, :class "yes"})))))
 
 (deftest make-apply-filter-add-attribute
   (let [ds (make-dataset :test [:a :b {:c [:g :m]}]
