@@ -192,12 +192,19 @@
 
 (deffilter remove-useless-attributes)
 
-(defmethod make-filter-options :resample
+(defmethod make-filter-options :resample-unsupervised
   ([kind m]
      (->> (check-option-values m {:seed "-S" :size-percent "-Z"})
           (check-options m {:no-replacement "-no-replacement" :invert "-V"}))))
 
-(deffilter resample)
+(deffilter resample-unsupervised)
+
+(defmethod make-filter-options :resample-supervised
+  ([kind m]
+     (->> (check-option-values m {:seed "-S" :size-percent "-Z" :bias "-B"})
+          (check-options m {:no-replacement "-no-replacement" :invert "-V"}))))
+
+(deffilter resample-supervised)
 
 (defmethod make-filter-options :select-append-attributes
   ([kind m]
@@ -235,7 +242,8 @@
    :remove-percentage weka.filters.unsupervised.instance.RemovePercentage
    :remove-range weka.filters.unsupervised.instance.RemoveRange
    :remove-useless-attributes weka.filters.unsupervised.attribute.RemoveUseless
-   :resample weka.filters.unsupervised.instance.Resample
+   :resample-unsupervised weka.filters.unsupervised.instance.Resample
+   :resample-supervised weka.filters.supervised.instance.Resample
    :select-append-attributes weka.filters.unsupervised.attribute.Copy
    :project-attributes weka.filters.unsupervised.attribute.Remove})
 
@@ -258,7 +266,8 @@
      - :remove-percentage
      - :remove-range
      - :remove-useless-attributes
-     - :resample
+     - :resample-unsupervised
+     - :resample-supervised
      - :select-append-attributes
      - :project-attributes
      - :clj-streamable
@@ -432,7 +441,7 @@
             Note: percentage, not decimal. e.g. 89 not 0.89
             If you pass in a decimal Weka silently sets it to 0.0.
 
-    * :resample
+    * :resample-unsupervised
 
       \"Produces a random subsample of a dataset using either sampling
       with replacement or without replacement. The original dataset
@@ -448,6 +457,38 @@
         - :size-percent
           \"The size of the output dataset, as a percentage of
           the input dataset (default 100)\" (integer)
+
+        - :no-replacement
+          Use replacement or not; default is false, i.e., with replacement (boolean)
+
+        - :invert
+          Inverts the selection; can only be true if :replacement is false (boolean)
+
+    * :resample-supervised
+
+      \"Produces a random subsample of a dataset using either sampling
+      with replacement or without replacement. The original dataset
+      must fit entirely in memory. The number of instances in the
+      generated dataset may be specified. The dataset must have a
+      nominal class attribute. If not, use the unsupervised
+      version. The filter can be made to maintain the class
+      distribution in the subsample, or to bias the class distribution
+      toward a uniform distribution. When used in batch mode (i.e. in
+      the FilteredClassifier), subsequent batches are NOT resampled.\"
+      -- from Weka JavaDoc.
+
+      Parameters:
+
+        - :seed
+          Random number seed (integer)
+
+        - :size-percent
+          \"The size of the output dataset, as a percentage of
+          the input dataset (default 100)\" (integer)
+
+        - :bias \"Bias factor towards uniform class distribution.0 =
+          distribution in input data -- 1 = uniform
+          distribution. (default 0)\" (0 or 1)
 
         - :no-replacement
           Use replacement or not; default is false, i.e., with replacement (boolean)

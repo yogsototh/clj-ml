@@ -34,11 +34,19 @@
         filter (make-filter :remove-useless-attributes {:dataset-format ds :max-variance 95})]
     (is (== (.getMaximumVariancePercentageAllowed filter) 95))))
 
-(deftest make-filter-resample
+(deftest make-filter-resample-unsupervised
   (fact
    (let [ds (load-instances :arff "http://repository.seasr.org/Datasets/UCI/arff/iris.arff")
-         options (make-filter-options :resample {:dataset-format ds :seed 10 :size-percent 50 :no-replacement true :invert true})]
+         options (make-filter-options :resample-unsupervised
+                                      {:dataset-format ds :seed 10 :size-percent 50 :no-replacement true :invert true})]
      options => (just ["-S" "10" "-Z" "50" "-V" "-no-replacement"] :in-any-order))))
+
+(deftest make-filter-resample-supervised
+  (fact
+   (let [ds (load-instances :arff "http://repository.seasr.org/Datasets/UCI/arff/iris.arff")
+         options (make-filter-options :resample-supervised
+                                      {:dataset-format ds :seed 10 :size-percent 50 :no-replacement true :invert true :bias 1})]
+     options => (just ["-S" "10" "-Z" "50" "-V" "-no-replacement" "-B" "1"] :in-any-order))))
 
 (deftest make-filter-discretize-sup
   (let [ds (make-dataset :test [:a :b {:c [:g :m]}]
@@ -92,10 +100,17 @@
     (is (= weka.filters.unsupervised.attribute.Reorder
            (class f)))))
 
-(deftest make-filter-reorder-attributes
+(deftest make-filter-resample-unsupervised
   (let [ds (load-instances :arff "http://repository.seasr.org/Datasets/UCI/arff/iris.arff")
-        f (make-filter :resample {:dataset-format ds :seed 10 :size-percent 50 :replacement true})]
+        f (make-filter :resample-unsupervised {:dataset-format ds :seed 10 :size-percent 50 :replacement true})]
     (is (= weka.filters.unsupervised.instance.Resample
+           (class f)))))
+
+(deftest make-filter-resample-supervised
+  (let [ds (dataset-set-class (load-instances :arff "http://repository.seasr.org/Datasets/UCI/arff/iris.arff")
+                              :class)
+        f (make-filter :resample-supervised {:dataset-format ds :seed 10 :size-percent 50 :replacement true :bias 1})]
+    (is (= weka.filters.supervised.instance.Resample
            (class f)))))
 
 (deftest make-filter-remove-attributes
@@ -178,9 +193,15 @@
     (is (= (str ds (str (make-dataset :test [{:s nil} :n {:class [:yes :no]}]
                                       [["Hello" 55 :yes] ["World" -100 :no]])))))))
 
-(deftest make-apply-filter-resample
+(deftest make-apply-filter-resample-unsupervised
   (let [ds (load-instances :arff "http://repository.seasr.org/Datasets/UCI/arff/iris.arff")
-        ds2 (make-apply-filter :resample {:seed 10 :size-percent 50 :replacement true} ds)]
+        ds2 (make-apply-filter :resample-unsupervised {:seed 10 :size-percent 50 :replacement true} ds)]
+    (is (= 75 (dataset-count ds2)))))
+
+(deftest make-apply-filter-resample-supervised
+  (let [ds (dataset-set-class (load-instances :arff "http://repository.seasr.org/Datasets/UCI/arff/iris.arff")
+                              :class)
+        ds2 (make-apply-filter :resample-supervised {:seed 10 :size-percent 50 :replacement true :bias 1} ds)]
     (is (= 75 (dataset-count ds2)))))
 
 (deftest make-apply-filters-test
