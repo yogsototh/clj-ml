@@ -2,6 +2,9 @@
   :description "Machine Learning library for Clojure built around Weka and friends"
   :java-source-paths ["src/java"]
   :warn-on-reflection true
+  :license {:name "MIT License"
+            :url "http://opensource.org/licenses/MIT"}
+  :url "https://github.com/joshuaeckroth/clj-ml"
   :dependencies [[org.clojure/clojure "1.4.0"]
                  [incanter/incanter-core "1.4.1"]
                  [incanter/incanter-charts "1.4.1"]

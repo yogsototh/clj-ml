@@ -16,16 +16,16 @@ git clone the project, then run:
 
 ### Installing from Clojars
 
-    [org.clojars.bmabey/clj-ml "0.2.4"]
+    [cc.artifice/clj-ml "0.3.0"]
 
 ### Installing from Maven
 
 (add Clojars repository)
 
     <dependency>
-      <groupId>clj-ml</groupId>
+      <groupId>cc.artifice</groupId>
       <artifactId>clj-ml</artifactId>
-      <version>0.2.4</version>
+      <version>0.3.0</version>
     </dependency>
 
 ## Supported algorithms
@@ -35,6 +35,7 @@ git clone the project, then run:
    * unsupervised discretize
    * supervised nominal to binary
    * unsupervised nominal to binary
+   * string to word vector
 
  * Classifiers
    * C4.5 (J4.8)
