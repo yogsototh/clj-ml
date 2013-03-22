@@ -79,6 +79,13 @@
     (is (= weka.filters.unsupervised.attribute.StringToWordVector
            (class f)))))
 
+(deftest make-filter-reorder-attributes
+  (let [ds (make-dataset :test [{:class [:yes :no]} {:s nil} :n]
+                         [[:yes "Hello" 55] [:no "World" -100]])
+        f (make-filter :reorder-attributes {:dataset-format ds :attributes ["2-last" "1"]})]
+    (is (= weka.filters.unsupervised.attribute.Reorder
+           (class f)))))
+
 (deftest make-filter-remove-attributes
   (let [ds (make-dataset :test [:a :b {:c [:g :m]}]
                                      [ [1 2 :g]
@@ -151,6 +158,13 @@
         res (add-attribute ds {:type :nominal, :column 1, :name "pet", :labels ["dog" "cat"]})]
     (is (= (dataset-format res)
            [:a {:pet '(:dog :cat)} :b {:c '(:g :m)}]))))
+
+(deftest make-apply-filter-reorder-attributes
+  (let [ds (make-dataset :test [{:class [:yes :no]} {:s nil} :n]
+                         [[:yes "Hello" 55] [:no "World" -100]]) 
+        ds2 (make-apply-filter :reorder-attributes {:attributes ["2-last" "1"]} ds)]
+    (is (= (str ds (str (make-dataset :test [{:s nil} :n {:class [:yes :no]}]
+                                      [["Hello" 55 :yes] ["World" -100 :no]])))))))
 
 (deftest make-apply-filters-test
   (let [ds (make-dataset :test [:a :b {:c [:g :m]}]

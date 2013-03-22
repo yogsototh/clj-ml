@@ -160,6 +160,11 @@
 
 (deffilter add-attribute)
 
+(defmethod make-filter-options :reorder-attributes
+  ([kind m] (extract-attributes m)))
+
+(deffilter reorder-attributes)
+
 (defmethod make-filter-options :remove-attributes
   ([kind m]
      (->> (extract-attributes m)
@@ -218,6 +223,7 @@
    :numeric-to-nominal weka.filters.unsupervised.attribute.NumericToNominal
    :string-to-word-vector weka.filters.unsupervised.attribute.StringToWordVector
    :add-attribute weka.filters.unsupervised.attribute.Add
+   :reorder-attributes weka.filters.unsupervised.attribute.Reorder
    :remove-attributes weka.filters.unsupervised.attribute.Remove
    :remove-percentage weka.filters.unsupervised.instance.RemovePercentage
    :remove-range weka.filters.unsupervised.instance.RemoveRange
@@ -239,6 +245,7 @@
      - :numeric-to-nominal
      - :string-to-word-vector
      - :add-attribute
+     - :reorder-attributes
      - :remove-attributes
      - :remove-percentage
      - :remove-range
@@ -380,6 +387,18 @@
         - :format
             The format of the date values (see ISO-8601).  This only applies when the type is :date.
             The default is: \"yyyy-MM-dd'T'HH:mm:ss\"
+
+    * :reorder-attributes
+
+      Reorder attributes.
+
+      Parameters:
+
+        - :attributes
+            New ordering of the attributes. Sample value: [\"2-last\" \"1\"],
+            which moves the attribute currently at position 1 to the end.
+            Be sure to quote all attributes so that number indexes are not
+            automatically incremented by 1 (Weka indexes start at 1).
 
     * :remove-attributes
 

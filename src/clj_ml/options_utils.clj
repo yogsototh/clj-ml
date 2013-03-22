@@ -43,7 +43,8 @@
      (if-let [attributes (key-name m)]
        [flag (str/join ","
                        (for [attr attributes]
-                         (inc (dataset-index-attr (:dataset-format m) attr))))]
+                         (if (string? attr) attr
+                             (inc (dataset-index-attr (:dataset-format m) attr)))))]
        [])))
 
 

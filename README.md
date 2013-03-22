@@ -36,6 +36,7 @@ git clone the project, then run:
    * supervised nominal to binary
    * unsupervised nominal to binary
    * string to word vector
+   * reorder attributes
 
  * Classifiers
    * C4.5 (J4.8)
