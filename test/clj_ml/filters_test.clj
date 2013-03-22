@@ -1,5 +1,5 @@
 (ns clj-ml.filters-test
-  (:use [clj-ml filters data] :reload-all)
+  (:use [clj-ml filters data io] :reload-all)
   (:use clojure.test midje.sweet))
 
 (deftest make-filter-options-supervised-discretize
@@ -33,6 +33,12 @@
   (let [ds (make-dataset :foo [:a] [[1] [2]])
         filter (make-filter :remove-useless-attributes {:dataset-format ds :max-variance 95})]
     (is (== (.getMaximumVariancePercentageAllowed filter) 95))))
+
+(deftest make-filter-resample
+  (fact
+   (let [ds (load-instances :arff "http://repository.seasr.org/Datasets/UCI/arff/iris.arff")
+         options (make-filter-options :resample {:dataset-format ds :seed 10 :size-percent 50 :no-replacement true :invert true})]
+     options => (just ["-S" "10" "-Z" "50" "-V" "-no-replacement"] :in-any-order))))
 
 (deftest make-filter-discretize-sup
   (let [ds (make-dataset :test [:a :b {:c [:g :m]}]
@@ -84,6 +90,12 @@
                          [[:yes "Hello" 55] [:no "World" -100]])
         f (make-filter :reorder-attributes {:dataset-format ds :attributes ["2-last" "1"]})]
     (is (= weka.filters.unsupervised.attribute.Reorder
+           (class f)))))
+
+(deftest make-filter-reorder-attributes
+  (let [ds (load-instances :arff "http://repository.seasr.org/Datasets/UCI/arff/iris.arff")
+        f (make-filter :resample {:dataset-format ds :seed 10 :size-percent 50 :replacement true})]
+    (is (= weka.filters.unsupervised.instance.Resample
            (class f)))))
 
 (deftest make-filter-remove-attributes
@@ -165,6 +177,11 @@
         ds2 (make-apply-filter :reorder-attributes {:attributes ["2-last" "1"]} ds)]
     (is (= (str ds (str (make-dataset :test [{:s nil} :n {:class [:yes :no]}]
                                       [["Hello" 55 :yes] ["World" -100 :no]])))))))
+
+(deftest make-apply-filter-resample
+  (let [ds (load-instances :arff "http://repository.seasr.org/Datasets/UCI/arff/iris.arff")
+        ds2 (make-apply-filter :resample {:seed 10 :size-percent 50 :replacement true} ds)]
+    (is (= 75 (dataset-count ds2)))))
 
 (deftest make-apply-filters-test
   (let [ds (make-dataset :test [:a :b {:c [:g :m]}]
