@@ -7,8 +7,8 @@
   clj-ml.io
   "Functions for reading and saving datasets, classifiers and clusterers to files and other
    persistence mechanisms."
-  (:import (weka.core.converters CSVLoader ArffLoader XRFFLoader)
-           (weka.core.converters CSVSaver ArffSaver XRFFSaver)
+  (:import (weka.core.converters CSVLoader ArffLoader XRFFLoader LibSVMLoader)
+           (weka.core.converters CSVSaver ArffSaver XRFFSaver LibSVMSaver)
            (java.io File InputStream OutputStream)
            (java.net URL URI)))
 
@@ -44,6 +44,11 @@
      (let [loader (new CSVLoader)]
        (m-load-instances loader source))))
 
+(defmethod load-instances :libsvm
+  ([kind source & options]
+     (let [loader (new LibSVMLoader)]
+       (m-load-instances loader source))))
+
 ;; Saving of instances
 
 (defmulti save-instances
@@ -72,4 +77,9 @@
 (defmethod save-instances :csv
   ([kind destiny instances & options]
      (let [saver (new CSVSaver)]
+       (m-save-instances saver destiny instances))))
+
+(defmethod save-instances :libsvm
+  ([kind destiny instances & options]
+     (let [saver (new LibSVMSaver)]
        (m-save-instances saver destiny instances))))
