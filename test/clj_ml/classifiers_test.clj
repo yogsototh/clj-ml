@@ -5,11 +5,12 @@
 
 (deftest make-classifiers-options-c45
   (fact
-    (let [options (make-classifier-options :decision-tree :c45 {:unpruned true :reduced-error-pruning true :only-binary-splits true :no-raising true
-                                                                :no-cleanup true :laplace-smoothing true :pruning-confidence 0.12 :minimum-instances 10
-                                                                :pruning-number-folds 5 :random-seed 1})]
-      options => (just ["-U" "-R" "-B" "-S" "-L" "-A" "-C" "0.12" "-M" "10" "-N" "5" "-Q" "1"] :in-any-order))))
-
+   (let [options (make-classifier-options
+                  :decision-tree :c45
+                  {:unpruned true :reduced-error-pruning true :only-binary-splits true :no-raising true
+                   :no-cleanup true :laplace-smoothing true :pruning-confidence 0.12 :minimum-instances 10
+                   :pruning-number-folds 5 :random-seed 1})]
+     options => (just ["-U" "-R" "-B" "-S" "-L" "-A" "-C" "0.12" "-M" "10" "-N" "5" "-Q" "1"] :in-any-order))))
 
 (deftest make-classifier-c45
   (let [c (make-classifier :decision-tree :c45)]
