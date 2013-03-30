@@ -67,7 +67,7 @@
            (weka.classifiers.trees J48 RandomForest M5P)
            (weka.classifiers.meta LogitBoost AdditiveRegression RotationForest)
            (weka.classifiers.bayes NaiveBayes NaiveBayesUpdateable)
-           (weka.classifiers.functions MultilayerPerceptron SMO LinearRegression Logistic PaceRegression SPegasos)
+           (weka.classifiers.functions MultilayerPerceptron SMO LinearRegression Logistic PaceRegression SPegasos LibSVM)
            (weka.classifiers Classifier Evaluation)))
 
 
@@ -137,6 +137,26 @@
                                 :epochs "-E"
                                 :lambda "-L"}))))
 
+(defmethod make-classifier-options [:support-vector-machine :libsvm]
+  ([kind algorithm m]
+     (->> (check-options m {:normalization "-Z"
+                            :no-nominal-to-binary "-J"
+                            :no-missing-value-replacement "-V"
+                            :no-shrinking-heuristics "-H"
+                            :probability-estimates "-B"})
+          (check-option-values m
+                               {:svm-type "-S"
+                                :kernel-type "-K"
+                                :kernel-degree "-D"
+                                :kernel-gamma "-G"
+                                :kernel-coef0 "-R"
+                                :param-C "-C"
+                                :param-nu "-N"
+                                :loss-epsilon "-P"
+                                :memory-cache "-M"
+                                :tolerance-of-termination "-E"
+                                :class-weight "-W"
+                                :random-seed "-seed"}))))
 
 (defmethod make-classifier-options [:regression :linear]
   ([kind algorithm m]
@@ -365,6 +385,10 @@
             Value of the seed for the random generator. Values should be longs greater than
             0. Default value: 1
 
+     * :support-vector-machine :libsvm
+
+       TODO
+
      * :regression :linear
 
       Parameters:
@@ -421,6 +445,10 @@
 (defmethod make-classifier [:support-vector-machine :spegasos]
   ([kind algorithm & options]
      (make-classifier-with kind algorithm SPegasos options)))
+
+(defmethod make-classifier [:support-vector-machine :libsvm]
+  ([kind algorithm & options]
+     (make-classifier-with kind algorithm LibSVM options)))
 
 (defmethod make-classifier [:regression :linear]
   ([kind algorithm & options]
