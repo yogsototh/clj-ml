@@ -16,7 +16,7 @@ git clone the project, then run:
 
 ### Installing from Clojars
 
-    [cc.artifice/clj-ml "0.3.4"]
+    [cc.artifice/clj-ml "0.3.5"]
 
 ### Installing from Maven
 
@@ -43,6 +43,7 @@ git clone the project, then run:
    * C4.5 (J4.8)
    * naive Bayes
    * multilayer perceptron
+   * support vector machines
 
  * Clusterers
    * k-means
