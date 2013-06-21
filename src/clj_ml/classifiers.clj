@@ -474,8 +474,8 @@
      (for [c (range -5 17 2) g (range 3 -17 -2)]
        (make-classifier-with
         :support-vector-machine :libsvm
-        LibSVM (assoc options :param-C (Math/pow 2.0 c)
-                      :kernel-gamma (Math/pow 2.0 g))))))
+        LibSVM (concat options [:param-C (Math/pow 2.0 c)
+                                :kernel-gamma (Math/pow 2.0 g)])))))
 
 (defmethod make-classifier [:regression :linear]
   ([kind algorithm & options]

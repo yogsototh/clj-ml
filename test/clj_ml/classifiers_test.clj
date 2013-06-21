@@ -65,6 +65,13 @@
         res (classifier-evaluate c :cross-validation ds 2)]
     (is (= 28 (count (keys res))))))
 
+(deftest classifier-evaluate-cross-validation-grid
+  (let [c (make-classifier :support-vector-machine :libsvm-grid)
+        ds (clj-ml.data/make-dataset "test" [:a :b {:c [:m :n]}] [[1 2 :m] [4 5 :m]])
+        _  (clj-ml.data/dataset-set-class ds 2)
+        res (classifier-evaluate c :cross-validation ds 2)]
+    (is (= 28 (count (keys res))))))
+
 (deftest update-updateable-classifier
   (let [c (clj-ml.classifiers/make-classifier :bayes :naive {:updateable true})
         ds (clj-ml.data/make-dataset "test" [:a :b {:c [:m :n]}] [[1 2 :m] [4 5 :m]])

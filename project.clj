@@ -9,6 +9,7 @@
                  [incanter/incanter-core "1.4.1"]
                  [incanter/incanter-charts "1.4.1"]
                  [nz.ac.waikato.cms.weka/weka-stable "3.6.9"]
+                 [tw.edu.ntu.csie/libsvm "3.1"]
                  [org.clojars.chapmanb/fast-random-forest "0.98"]]
   :profiles {:dev
              {:plugins [[lein-midje "2.0.0"]]
