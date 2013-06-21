@@ -158,6 +158,25 @@
                                 :class-weight "-W"
                                 :random-seed "-seed"}))))
 
+(defmethod make-classifier-options [:support-vector-machine :libsvm-grid]
+  ([kind algorithm m]
+     (->> (check-options m {:normalization "-Z"
+                            :no-nominal-to-binary "-J"
+                            :no-missing-value-replacement "-V"
+                            :no-shrinking-heuristics "-H"
+                            :probability-estimates "-B"})
+          (check-option-values m
+                               {:svm-type "-S"
+                                :kernel-type "-K"
+                                :kernel-degree "-D"
+                                :kernel-coef0 "-R"
+                                :param-nu "-N"
+                                :loss-epsilon "-P"
+                                :memory-cache "-M"
+                                :tolerance-of-termination "-E"
+                                :class-weight "-W"
+                                :random-seed "-seed"}))))
+
 (defmethod make-classifier-options [:regression :linear]
   ([kind algorithm m]
      (->> (check-options m {:debug "-D"
@@ -450,6 +469,14 @@
   ([kind algorithm & options]
      (make-classifier-with kind algorithm LibSVM options)))
 
+(defmethod make-classifier [:support-vector-machine :libsvm-grid]
+  ([kind algorithm & options]
+     (for [c (range -5 17 2) g (range 3 -17 -2)]
+       (make-classifier-with
+        :support-vector-machine :libsvm
+        LibSVM (assoc options :param-C (Math/pow 2.0 c)
+                      :kernel-gamma (Math/pow 2.0 g))))))
+
 (defmethod make-classifier [:regression :linear]
   ([kind algorithm & options]
      (make-classifier-with kind algorithm LinearRegression options)))
@@ -616,18 +643,26 @@
 
 (defmethod classifier-evaluate :dataset
   ([^Classifier classifier mode & [training-data test-data]]
-     (let [evaluation (new Evaluation training-data)
-           class-labels (dataset-class-labels training-data)]
-       (.evaluateModel evaluation classifier test-data (into-array []))
-       (collect-evaluation-results class-labels evaluation))))
+     (letfn [(eval-fn [classifier]
+               (let [evaluation (new Evaluation training-data)
+                     class-labels (dataset-class-labels training-data)]
+                 (.evaluateModel evaluation classifier test-data (into-array []))
+                 (collect-evaluation-results class-labels evaluation)))]
+       (if (vector? classifier)
+         (last (sort-by :correct (map eval-fn classifier)))
+         (eval-fn classifier)))))
 
 (defmethod classifier-evaluate :cross-validation
   ([classifier mode & [training-data folds]]
-     (let [evaluation (new Evaluation training-data)
-           class-labels (dataset-class-labels training-data)]
-       (.crossValidateModel evaluation classifier training-data folds (new Random (.getTime (new Date))) (into-array []))
-       (collect-evaluation-results class-labels evaluation))))
-
+     (letfn [(eval-fn [classifier]
+               (let [evaluation (new Evaluation training-data)
+                     class-labels (dataset-class-labels training-data)]
+                 (.crossValidateModel evaluation classifier training-data folds
+                                      (new Random (.getTime (new Date))) (into-array []))
+                 (collect-evaluation-results class-labels evaluation)))]
+       (if (vector? classifier)
+         (last (sort-by :correct (map eval-fn classifier)))
+         (eval-fn classifier)))))
 
 ;; Classifying instances
 
