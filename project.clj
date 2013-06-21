@@ -1,4 +1,4 @@
-(defproject cc.artifice/clj-ml "0.3.5"
+(defproject cc.artifice/clj-ml "0.3.6"
   :description "Machine Learning library for Clojure built around Weka and friends"
   :java-source-paths ["src/java"]
   :warn-on-reflection true
