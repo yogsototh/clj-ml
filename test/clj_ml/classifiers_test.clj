@@ -42,7 +42,6 @@
     (classifier-train c ds)
     (is true)))
 
-
 (deftest classifier-evaluate-dataset
   (let [c   (make-classifier :decision-tree :c45)
         ds  (clj-ml.data/make-dataset "test" [:a :b {:c [:m :n]}] [[1 2 :m] [4 5 :m]])
@@ -51,13 +50,12 @@
         _   (clj-ml.data/dataset-set-class tds 2)
         _   (classifier-train c ds)
         res (classifier-evaluate c :dataset ds tds)]
-    (is (= 26 (count (keys res))))))
+    (is (= 28 (count (keys res))))))
 
 (deftest make-classifier-svm-smo-polykernel
   (let [svm (make-classifier :support-vector-machine :smo {:kernel-function {:polynomic {:exponent 2.0}}})]
     (is (= weka.classifiers.functions.supportVector.PolyKernel
            (class (.getKernel svm))))))
-
 
 (deftest classifier-evaluate-cross-validation
   (let [c (make-classifier :decision-tree :c45)
@@ -65,7 +63,7 @@
         _  (clj-ml.data/dataset-set-class ds 2)
         _  (classifier-train c ds)
         res (classifier-evaluate c :cross-validation ds 2)]
-    (is (= 26 (count (keys res))))))
+    (is (= 28 (count (keys res))))))
 
 (deftest update-updateable-classifier
   (let [c (clj-ml.classifiers/make-classifier :bayes :naive {:updateable true})
