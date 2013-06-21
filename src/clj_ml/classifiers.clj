@@ -646,7 +646,15 @@
      (letfn [(eval-fn [c]
                (let [evaluation (new Evaluation training-data)
                      class-labels (dataset-class-labels training-data)]
-                 (.evaluateModel evaluation c test-data (into-array []))
+                 ;; capture stdout (libsvm is noisy)
+                 (let [out System/out
+                       err System/err
+                       s (java.io.PrintStream. (java.io.ByteArrayOutputStream.))]
+                   (System/setOut s)
+                   (System/setErr s)
+                   (.evaluateModel evaluation c test-data (into-array []))
+                   (System/setOut out)
+                   (System/setErr err))
                  (collect-evaluation-results class-labels evaluation)))]
        (if (seq? classifier)
          (last (sort-by :correct (map eval-fn classifier)))
@@ -657,8 +665,16 @@
      (letfn [(eval-fn [c]
                (let [evaluation (new Evaluation training-data)
                      class-labels (dataset-class-labels training-data)]
-                 (.crossValidateModel evaluation c training-data folds
-                                      (new Random (.getTime (new Date))) (into-array []))
+                 ;; capture stdout (libsvm is noisy)
+                 (let [out System/out
+                       err System/err
+                       s (java.io.PrintStream. (java.io.ByteArrayOutputStream.))]
+                   (System/setOut s)
+                   (System/setErr s)
+                   (.crossValidateModel evaluation c training-data folds
+                                        (new Random (.getTime (new Date))) (into-array []))
+                   (System/setOut out)
+                   (System/setErr err))
                  (collect-evaluation-results class-labels evaluation)))]
        (if (seq? classifier)
          (last (sort-by :correct (map eval-fn classifier)))
