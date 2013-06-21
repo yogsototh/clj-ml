@@ -643,24 +643,24 @@
 
 (defmethod classifier-evaluate :dataset
   ([^Classifier classifier mode & [training-data test-data]]
-     (letfn [(eval-fn [classifier]
+     (letfn [(eval-fn [c]
                (let [evaluation (new Evaluation training-data)
                      class-labels (dataset-class-labels training-data)]
-                 (.evaluateModel evaluation classifier test-data (into-array []))
+                 (.evaluateModel evaluation c test-data (into-array []))
                  (collect-evaluation-results class-labels evaluation)))]
-       (if (vector? classifier)
+       (if (seq? classifier)
          (last (sort-by :correct (map eval-fn classifier)))
          (eval-fn classifier)))))
 
 (defmethod classifier-evaluate :cross-validation
   ([classifier mode & [training-data folds]]
-     (letfn [(eval-fn [classifier]
+     (letfn [(eval-fn [c]
                (let [evaluation (new Evaluation training-data)
                      class-labels (dataset-class-labels training-data)]
-                 (.crossValidateModel evaluation classifier training-data folds
+                 (.crossValidateModel evaluation c training-data folds
                                       (new Random (.getTime (new Date))) (into-array []))
                  (collect-evaluation-results class-labels evaluation)))]
-       (if (vector? classifier)
+       (if (seq? classifier)
          (last (sort-by :correct (map eval-fn classifier)))
          (eval-fn classifier)))))
 
