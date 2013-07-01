@@ -354,7 +354,7 @@ If the class is nominal then the string value (not keyword) is returned."
   (with-meta (reduce (fn [m i]
                        (assoc m (keyword (attribute-name-at instance i)) (instance-value-at instance i)))
                      {}
-                     (range (.numValues instance)))
+                     (range (.numAttributes instance)))
     {:weight (.weight instance)}))
 
 
