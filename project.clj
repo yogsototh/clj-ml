@@ -1,7 +1,6 @@
-(defproject cc.artifice/clj-ml "0.3.6"
+(defproject cc.artifice/clj-ml "0.3.7"
   :description "Machine Learning library for Clojure built around Weka and friends"
   :java-source-paths ["src/java"]
-  :warn-on-reflection true
   :license {:name "MIT License"
             :url "http://opensource.org/licenses/MIT"}
   :url "https://github.com/joshuaeckroth/clj-ml"
@@ -10,6 +9,7 @@
                  [incanter/incanter-charts "1.4.1"]
                  [nz.ac.waikato.cms.weka/weka-stable "3.6.9"]
                  [tw.edu.ntu.csie/libsvm "3.1"]
+                 [org.apache.lucene/lucene-snowball "3.0.3"]
                  [org.clojars.chapmanb/fast-random-forest "0.98"]]
   :profiles {:dev
              {:plugins [[lein-midje "2.0.0"]]

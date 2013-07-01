@@ -26,8 +26,11 @@
 
 (deftest make-filter-options-string-to-word-vector
   (fact
-   (let [options (make-filter-options :string-to-word-vector {:attributes [1] :lowercase true :counts false :words-to-keep 20 :transform-idf true})]
-     options => (just ["-R" "2" "-L" "-W" "20" "-I"] :in-any-order))))
+   (let [options (make-filter-options :string-to-word-vector
+                                      {:attributes [1] :lowercase true :counts false
+                                       :words-to-keep 20 :transform-idf true
+                                       :stemmer "weka.core.stemmers.SnowballStemmer -S English"})]
+     options => (just ["-R" "2" "-L" "-W" "20" "-I" "-stemmer" "weka.core.stemmers.SnowballStemmer -S English"] :in-any-order))))
 
 (deftest make-filter-remove-useless-attributes
   (let [ds (make-dataset :foo [:a] [[1] [2]])
@@ -36,14 +39,16 @@
 
 (deftest make-filter-resample-unsupervised
   (fact
-   (let [ds (load-instances :arff "http://repository.seasr.org/Datasets/UCI/arff/iris.arff")
+   (let [ds (do (println "Loading instances from http://repository.seasr.org/Datasets/UCI/arff/iris.arff ...")
+                (load-instances :arff "http://repository.seasr.org/Datasets/UCI/arff/iris.arff"))
          options (make-filter-options :resample-unsupervised
                                       {:dataset-format ds :seed 10 :size-percent 50 :no-replacement true :invert true})]
      options => (just ["-S" "10" "-Z" "50" "-V" "-no-replacement"] :in-any-order))))
 
 (deftest make-filter-resample-supervised
   (fact
-   (let [ds (load-instances :arff "http://repository.seasr.org/Datasets/UCI/arff/iris.arff")
+   (let [ds (do (println "Loading instances from http://repository.seasr.org/Datasets/UCI/arff/iris.arff ...")
+                (load-instances :arff "http://repository.seasr.org/Datasets/UCI/arff/iris.arff"))
          options (make-filter-options :resample-supervised
                                       {:dataset-format ds :seed 10 :size-percent 50 :no-replacement true :invert true :bias 1})]
      options => (just ["-S" "10" "-Z" "50" "-V" "-no-replacement" "-B" "1"] :in-any-order))))
@@ -101,14 +106,17 @@
            (class f)))))
 
 (deftest make-filter-resample-unsupervised
-  (let [ds (load-instances :arff "http://repository.seasr.org/Datasets/UCI/arff/iris.arff")
+  (let [ds (do (println "Loading instances from http://repository.seasr.org/Datasets/UCI/arff/iris.arff ...")
+               (load-instances :arff "http://repository.seasr.org/Datasets/UCI/arff/iris.arff"))
         f (make-filter :resample-unsupervised {:dataset-format ds :seed 10 :size-percent 50 :replacement true})]
     (is (= weka.filters.unsupervised.instance.Resample
            (class f)))))
 
 (deftest make-filter-resample-supervised
-  (let [ds (dataset-set-class (load-instances :arff "http://repository.seasr.org/Datasets/UCI/arff/iris.arff")
-                              :class)
+  (let [ds (dataset-set-class
+            (do (println "Loading instances from http://repository.seasr.org/Datasets/UCI/arff/iris.arff ...")
+                (load-instances :arff "http://repository.seasr.org/Datasets/UCI/arff/iris.arff"))
+            :class)
         f (make-filter :resample-supervised {:dataset-format ds :seed 10 :size-percent 50 :replacement true :bias 1})]
     (is (= weka.filters.supervised.instance.Resample
            (class f)))))
@@ -168,14 +176,15 @@
 
 (deftest make-apply-filter-string-to-word-vector
   (let [ds (make-dataset :test [{:s nil} {:class [:yes :no]}]
-                         [["Hello, world!" :no]
+                         [["Hello, world! tests Dogs cats" :no]
                           ["This is a test, is a world." :yes]])]
     (is (= (map instance-to-map
-              (dataset-seq (make-apply-filter :string-to-word-vector
-                                              {:attributes [0] :counts true :lowercase true}
-                                              ds)))
-           '({:hello 1.0, :a 0.0, :class "no"}
-             {:test 1.0, :is 2.0, :hello 0.0, :a 2.0, :class "yes"})))))
+                (dataset-seq (make-apply-filter :string-to-word-vector
+                                                {:attributes [0] :counts true :lowercase true
+                                                 :stemmer "weka.core.stemmers.SnowballStemmer -S English"}
+                                                ds)))
+           '({:world 1.0, :this 0.0, :test 1.0, :is 0.0, :hello 1.0, :dog 1.0, :cat 1.0, :a 0.0, :class "no"}
+             {:world 1.0, :this 1.0, :test 1.0, :is 2.0, :hello 0.0, :dog 0.0, :cat 0.0, :a 2.0, :class "yes"})))))
 
 (deftest make-apply-filter-add-attribute
   (let [ds (make-dataset :test [:a :b {:c [:g :m]}]
@@ -194,13 +203,16 @@
                                       [["Hello" 55 :yes] ["World" -100 :no]])))))))
 
 (deftest make-apply-filter-resample-unsupervised
-  (let [ds (load-instances :arff "http://repository.seasr.org/Datasets/UCI/arff/iris.arff")
+  (let [ds (do (println "Loading instances from http://repository.seasr.org/Datasets/UCI/arff/iris.arff ...")
+               (load-instances :arff "http://repository.seasr.org/Datasets/UCI/arff/iris.arff"))
         ds2 (make-apply-filter :resample-unsupervised {:seed 10 :size-percent 50 :replacement true} ds)]
     (is (= 75 (dataset-count ds2)))))
 
 (deftest make-apply-filter-resample-supervised
-  (let [ds (dataset-set-class (load-instances :arff "http://repository.seasr.org/Datasets/UCI/arff/iris.arff")
-                              :class)
+  (let [ds (dataset-set-class
+            (do (println "Loading instances from http://repository.seasr.org/Datasets/UCI/arff/iris.arff ...")
+                (load-instances :arff "http://repository.seasr.org/Datasets/UCI/arff/iris.arff"))
+            :class)
         ds2 (make-apply-filter :resample-supervised {:seed 10 :size-percent 50 :replacement true :bias 1} ds)]
     (is (= 75 (dataset-count ds2)))))
 
