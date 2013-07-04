@@ -10,6 +10,6 @@
     (for [f files
           xmldoc (:content (xml/parse (reader f)))]
       {:id (:NEWID (:attrs xmldoc))
-       {:terms "Topics" (for [topic (:content (second (:content xmldoc)))]
-                          (first (:content topic)))}
+       {:terms {"Topics" (for [topic (:content (second (:content xmldoc)))]
+                           (first (:content topic)))}}
        :fulltext (first (:content (last (:content (last (:content xmldoc))))))})))
