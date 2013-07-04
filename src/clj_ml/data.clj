@@ -11,7 +11,12 @@
    the instances. Finally data sets can be transformed into Clojure sequences
    that can be transformed using usual Clojure functions like map, reduce, etc."
   (:use [clj-ml utils])
+  (:use [clj-ml.io :only [load-instances save-instances]])
   (:require [clj-ml.filters :as filters])
+  (:require [clojure.string :as str])
+  (:require [clojure.set :as set])
+  (:use [clojure.java.io :only [file]])
+  (:import [org.jsoup Jsoup])
   (:import (weka.core Instance Instances FastVector Attribute)
            (cljml ClojureInstances)))
 
@@ -493,3 +498,67 @@ split immediately you can use do-split-dataset."
   "Returns a subset of the given dataset containing the first 'num' instances."
   [ds num]
   (filters/remove-range ds {:range (str "first-" num) :invert true}))
+
+;; text-document datasets
+
+(defn dataset-filename
+  [datadir vocab-id term-id tag]
+  (format "%s/instances/%s-%d-%s.arff" datadir vocab-id term-id (name tag)))
+
+(defn docs-to-dataset
+  [docs vocab-id vocab-name term-id term-name keep-n datadir & opts]
+  (let [parsed-opts (apply hash-map opts)
+        docs-with-term (filter (fn [doc] (some #(= term-name %)
+                                               (get-in doc [:terms vocab-name])))
+                               docs)
+        docs-without-term (let [dwt (set/difference (set docs) (set docs-with-term))]
+                            (if (:resample parsed-opts)
+                              (take (count docs-with-term) dwt)
+                              dwt))
+        docs-keep-n (if keep-n (concat (take (/ keep-n 2) docs-with-term)
+                                       (take (/ keep-n 2) docs-without-term))
+                        (concat docs-with-term docs-without-term))
+        ds (make-dataset
+            :docs [{:class [:no :yes]} {:title nil} {:fulltext nil}]
+            (for [doc docs-keep-n]
+              (let [fulltext (str/replace (.text (Jsoup/parse (or (:fulltext doc) (:extracted doc) "")))
+                                          #"\s+" " ")
+                    fulltext-sub (subs fulltext 0 (min (count fulltext) 10000))
+                    title (:title doc "")
+                    has-tid? (some #(= term-name %) (get-in doc [:terms vocab-name]))]
+                [(if has-tid? :yes :no) title fulltext-sub])))
+        ds-title (let [f (filters/make-filter
+                          :string-to-word-vector
+                          {:dataset-format ds
+                           :attributes [1]
+                           :lowercase (:lowercase parsed-opts true)
+                           :prefix "title-" :words-to-keep (:words-to-keep parsed-opts 1000)
+                           :transform-tf (:transform-tf parsed-opts true)
+                           :transform-idf (:transform-idf parsed-opts true)
+                           :stemmer (if (:stemmer parsed-opts false)
+                                      "weka.core.stemmers.SnowballStemmer -S English")})]
+                   ;; if testing, initialize the filter with the training instances
+                   (when (:testing parsed-opts)
+                     (filters/filter-apply f (load-instances :arff (file (dataset-filename datadir vocab-id term-id :orig)))))
+                   (filters/filter-apply f ds))
+        ds-title-fulltext (let [f (filters/make-filter
+                                   :string-to-word-vector
+                                   {:dataset-format ds-title
+                                    :attributes [1]
+                                    :lowercase (:lowercase parsed-opts true)
+                                    :prefix "fulltext-" :words-to-keep (:words-to-keep parsed-opts 1000)
+                                    :transform-tf (:transform-tf parsed-opts true)
+                                    :transform-idf (:transform-idf parsed-opts true)
+                                    :stemmer (if (:stemmer parsed-opts false)
+                                               "weka.core.stemmers.SnowballStemmer -S English")})]
+                            ;; if testing, initialize the filter with the training instances
+                            (when (:testing parsed-opts)
+                              (filters/filter-apply f (load-instances :arff (file (dataset-filename datadir vocab-id term-id :title)))))
+                            (filters/filter-apply f ds-title))
+        ds-class (dataset-set-class ds-title-fulltext 0)]
+    ;; if training, save unfiltered instances to re-initialize filter later
+    (when (:training parsed-opts)
+      (save-instances :arff (file (dataset-filename datadir vocab-id term-id :orig)) ds)
+      (save-instances :arff (file (dataset-filename datadir vocab-id term-id :title)) ds-title))
+    ds-class))
+
