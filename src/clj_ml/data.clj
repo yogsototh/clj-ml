@@ -515,9 +515,9 @@ split immediately you can use do-split-dataset."
                             (if (:resample parsed-opts)
                               (take (count docs-with-term) dwt)
                               dwt))
-        docs-keep-n (if keep-n (concat (take (/ keep-n 2) docs-with-term)
-                                       (take (/ keep-n 2) docs-without-term))
-                        (concat docs-with-term docs-without-term))
+        docs-keep-n (shuffle (if keep-n (concat (take (/ keep-n 2) docs-with-term)
+                                                (take (/ keep-n 2) docs-without-term))
+                                 (concat docs-with-term docs-without-term)))
         ds (make-dataset
             :docs [{:class [:no :yes]} {:title nil} {:fulltext nil}]
             (for [doc docs-keep-n]
