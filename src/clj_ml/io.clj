@@ -10,7 +10,8 @@
   (:import (weka.core.converters CSVLoader ArffLoader XRFFLoader LibSVMLoader)
            (weka.core.converters CSVSaver ArffSaver XRFFSaver LibSVMSaver)
            (java.io File InputStream OutputStream)
-           (java.net URL URI)))
+           (java.net URL URI))
+  (:use [clojure.java.io :only [input-stream output-stream]]))
 
 
 ;; Loading of instances
@@ -21,10 +22,10 @@
 
 (defmacro m-load-instances [loader source]
   `(do
-     (if (= (class ~source)  java.io.File)
+     (if (= (class ~source) java.io.File)
        (.setFile ~loader ~source)
        (.setSource ~loader (if (= (class ~source) java.lang.String)
-                             (new URL ~source)
+                             (input-stream ~source)
                              ^InputStream ~source)))
      (.getDataSet ~loader)))
 
@@ -58,7 +59,7 @@
 (defmacro m-save-instances [saver destiny instances]
   `(do
      (condp #(isa? %2 %1) (class ~destiny)
-       String (.setFile ~saver (File. (URI. ~destiny)))
+       String (.setDestination ~saver (output-stream ~destiny))
        File (.setFile ~saver ~destiny)
        OutputStream (.setDestination ~saver ~destiny))
      (.setInstances ~saver ~instances)
