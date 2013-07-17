@@ -64,6 +64,7 @@
   (:import (java.util Date Random)
            (hr.irb.fastRandomForest FastRandomForest)
            (weka.core Instance Instances)
+           (weka.classifiers.lazy IBk)
            (weka.classifiers.trees J48 RandomForest M5P)
            (weka.classifiers.meta LogitBoost AdditiveRegression RotationForest)
            (weka.classifiers.bayes NaiveBayes NaiveBayesUpdateable)
@@ -77,6 +78,15 @@
   make-classifier-options
   "Creates the right parameters for a classifier. Returns the parameters as a Clojure vector."
   (fn [kind algorithm map] [kind algorithm]))
+
+(defmethod make-classifier-options [:lazy :ibk]
+  ([kind algorithm m]
+     (->> (check-options m
+                         {:inverse-weighted "-I"
+                          :similarity-weighted "-F"
+                          :no-normalization "-N"})
+          (check-option-values m
+                               {:num-neighbors "-K"}))))
 
 (defmethod make-classifier-options [:decision-tree :c45]
   ([kind algorithm m]
@@ -285,6 +295,7 @@
 
    The classifiers currently supported are:
 
+     - :lazy :ibk
      - :decision-tree :c45
      - :decision-tree :boosted-stump
      - :decision-tree :boosted-decision-tree
@@ -303,6 +314,25 @@
 
    This is the description of the supported classifiers and the accepted
    option parameters for each of them:
+
+    * :lazy :ibk
+
+      K-nearest neighbor classification.
+
+      Parameters:
+
+        - :inverse-weighted
+            Neighbors will be weighted by the inverse of their distance when voting. (default equal weighting)
+            Sample value: true
+        - :similarity-weighted
+            Neighbors will be weighted by their similarity when voting. (default equal weighting)
+            Sample value: true
+        - :no-normalization
+            Turns off normalization.
+            Sample value: true
+        - :num-neighbors
+            Set the number of nearest neighbors to use in prediction (default 1)
+            Sample value: 3
 
     * :decision-tree :c45
 
@@ -429,6 +459,10 @@
             Set the ridge in the log-likelihood.
 "
   (fn [kind algorithm & options] [kind algorithm]))
+
+(defmethod make-classifier [:lazy :ibk]
+  ([kind algorithm & options]
+     (make-classifier-with kind algorithm IBk options)))
 
 (defmethod make-classifier [:decision-tree :c45]
   ([kind algorithm & options]

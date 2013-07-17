@@ -2,6 +2,24 @@
   (:use [clj-ml classifiers data] :reload-all)
   (:use clojure.test midje.sweet))
 
+(deftest make-classifiers-options-ibk
+  (fact
+   (let [options (make-classifier-options
+                  :lazy :ibk
+                  {:inverse-weighted true :similarity-weighted true :no-normalization true :num-neighbors 3})]
+     options => (just ["-I" "-F" "-N" "-K" "3"] :in-any-order))))
+
+(deftest make-classifier-ibk
+  (let [c (make-classifier :lazy :ibk)]
+    (is (= (class c)
+           weka.classifiers.lazy.IBk))))
+
+(deftest train-classifier-ibk
+  (let [c (make-classifier :lazy :ibk)
+        ds (clj-ml.data/make-dataset "test" [:a :b {:c [:m :n]}] [[1 2 :m] [4 5 :m]])]
+    (clj-ml.data/dataset-set-class ds 2)
+    (classifier-train c ds)
+    (is true)))
 
 (deftest make-classifiers-options-c45
   (fact
