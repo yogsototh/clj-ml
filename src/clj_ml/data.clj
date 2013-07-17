@@ -533,6 +533,7 @@ split immediately you can use do-split-dataset."
                            :attributes [1]
                            :lowercase (:lowercase parsed-opts true)
                            :prefix "title-" :words-to-keep (:words-to-keep parsed-opts 1000)
+                           :counts (:counts parse-opts false)
                            :transform-tf (:transform-tf parsed-opts true)
                            :transform-idf (:transform-idf parsed-opts true)
                            :stemmer (if (:stemmer parsed-opts false)
@@ -547,6 +548,7 @@ split immediately you can use do-split-dataset."
                                     :attributes [1]
                                     :lowercase (:lowercase parsed-opts true)
                                     :prefix "fulltext-" :words-to-keep (:words-to-keep parsed-opts 1000)
+                                    :counts (:counts parse-opts false)
                                     :transform-tf (:transform-tf parsed-opts true)
                                     :transform-idf (:transform-idf parsed-opts true)
                                     :stemmer (if (:stemmer parsed-opts false)
