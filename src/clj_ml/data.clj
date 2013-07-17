@@ -523,11 +523,10 @@ split immediately you can use do-split-dataset."
             (for [doc docs-keep-n]
               (let [fulltext (str/replace (.text (Jsoup/parse (or (:fulltext doc) (:extracted doc) "")))
                                           #"\s+" " ")
-                    fulltext-sub (str/replace (subs fulltext 0 (min (count fulltext) 10000))
-                                              #"[^ \w\d]" "")
+                    fulltext-fixed (str/replace fulltext #"[^ \w\d]" "")
                     title (str/replace (:title doc "") #"[^ \w\d]" "")
                     has-tid? (some #(= term-name %) (get-in doc [:terms vocab-name]))]
-                [(if has-tid? :yes :no) title fulltext-sub])))
+                [(if has-tid? :yes :no) title fulltext-fixed])))
         ds-title (let [f (filters/make-filter
                           :string-to-word-vector
                           {:dataset-format ds
