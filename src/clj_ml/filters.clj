@@ -51,7 +51,7 @@
   (fn [kind map] kind))
 
 (declare make-apply-filter)
-;TODO: consider passing in the make-filter-options body here as well in additon to the docstring.
+;;TODO: consider passing in the make-filter-options body here as well in additon to the docstring.
 (defmacro deffilter
   "Defines the filter's fn that creates a fn to make and apply the filter."
   [filter-name]
@@ -153,10 +153,10 @@
          (update-in-when [:labels] (partial str/join ","))
          (update-in-when [:column] #(if (number? %) (inc %) %))
          (check-option-values {:type "-T"
-                                :labels "-L"
-                                :name "-N"
-                                :column "-C"
-                                :date-format "-F"}))))
+                               :labels "-L"
+                               :name "-N"
+                               :column "-C"
+                               :date-format "-F"}))))
 
 (deffilter add-attribute)
 
@@ -571,9 +571,9 @@
                          (let [^OptionHandler f (.newInstance class)]
                            (.setOptions f (into-array String (make-filter-options kind options)))
                            f)
-                 (case kind
-                   :clj-streamable (ClojureStreamFilter. (:process options) (:determine-dataset-format options))
-                   :clj-batch (ClojureBatchFilter. (:process options) (:determine-dataset-format options))))]
+                         (case kind
+                           :clj-streamable (ClojureStreamFilter. (:process options) (:determine-dataset-format options))
+                           :clj-batch (ClojureBatchFilter. (:process options) (:determine-dataset-format options))))]
     (doto filter (.setInputFormat (:dataset-format options)))))
 
 ;; Processing the filtering of data
@@ -602,7 +602,7 @@
    The :dataset-format attribute for the making of the filter will be setup to the
    dataset passed as an argument if no other value is provided."
   [filter-options dataset]
-  ;TODO: Consider using Weka's MultiFilter instead.. could be faster for streamable filters.
+                                        ;TODO: Consider using Weka's MultiFilter instead.. could be faster for streamable filters.
   (reduce
    (fn [ds [kind options]]
      (make-apply-filter kind options ds))

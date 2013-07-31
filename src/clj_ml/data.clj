@@ -136,7 +136,7 @@
      (make-instance dataset 1 vector))
   ([dataset weight vector]
      (let [^Instance inst (new Instance
-                     (count vector))]
+                               (count vector))]
        (do (.setDataset inst dataset)
            (loop [vs vector
                   c 0]
@@ -208,17 +208,17 @@
          (let [index-class-attribute (if (keyword? class-attribute)
                                        (loop [c 0
                                               acum attributes]
-                                           (if (= (let [at (first acum)]
-                                                        (if (map? at)
-                                                          (first (keys at))
-                                                          at))
-                                                  class-attribute)
-                                             c
-                                             (if (= c (count attributes))
-                                               (throw (new Exception "provided class attribute not found"))
-                                               (recur (+ c 1)
-                                                      (rest acum)))))
-                                           class-attribute)]
+                                         (if (= (let [at (first acum)]
+                                                  (if (map? at)
+                                                    (first (keys at))
+                                                    at))
+                                                class-attribute)
+                                           c
+                                           (if (= c (count attributes))
+                                             (throw (new Exception "provided class attribute not found"))
+                                             (recur (+ c 1)
+                                                    (rest acum)))))
+                                       class-attribute)]
            (.setClassIndex ds index-class-attribute)))
        ds)))
 
@@ -243,7 +243,7 @@
   "Returns map of the labels (possible values) for the given nominal attribute as the keys
    with the values being the attributes index. "
   [^Attribute attr]
-   (let [values (enumeration-seq (.enumerateValues attr))]
+  (let [values (enumeration-seq (.enumerateValues attr))]
     (if (empty? values)
       :not-nominal
       (reduce (fn [m ^String val]
@@ -274,14 +274,14 @@
 (defn dataset-format
   "Returns the definition of the attributes of this dataset"
   [dataset]
-   (reduce
-    (fn [so-far ^Attribute attr]
-      (conj so-far
-            (if (.isNominal attr)
-              {(keyword-name attr) (map keyword (enumeration-seq (.enumerateValues attr)))}
-              (keyword-name attr))))
-    []
-    (attributes dataset)))
+  (reduce
+   (fn [so-far ^Attribute attr]
+     (conj so-far
+           (if (.isNominal attr)
+             {(keyword-name attr) (map keyword (enumeration-seq (.enumerateValues attr)))}
+             (keyword-name attr))))
+   []
+   (attributes dataset)))
 
 (defn headers-only
   "Returns a new weka dataset (Instances) with the same headers as the given one"
@@ -328,7 +328,7 @@ If the class is nominal then the string value (not keyword) is returned."
 
 (defn instance-get-class
   "Get the index of the class attribute for this instance"
-   [^Instance instance]
+  [^Instance instance]
   (.classValue instance))
 
 (defn instance-value-at

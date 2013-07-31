@@ -100,13 +100,13 @@
                  the-plot (if (nil? plot)
                             (scatter-plot this-val-0 this-val-1
                                           :title title
-                                           :x-label (name (nth cols-names col-0))
-                                           :y-label (name (nth cols-names col-1))
-                                           :series-label (name (first ks))
-                                           :legend legend)
-                             (do (add-points plot this-val-0 this-val-1 :series-label (name (first ks)))
-                                 plot))]
-              (recur the-plot (rest ks))))))))
+                                          :x-label (name (nth cols-names col-0))
+                                          :y-label (name (nth cols-names col-1))
+                                          :series-label (name (first ks))
+                                          :legend legend)
+                            (do (add-points plot this-val-0 this-val-1 :series-label (name (first ks)))
+                                plot))]
+             (recur the-plot (rest ks))))))))
 
 
 ;; visualization of different objects
@@ -129,7 +129,7 @@
 
 (defn dataset-display-attributes [dataset attribute-x attribute-y & visualization-options]
   "Displays the distribution of a set of attributes for a dataset"
-    (let [attr-x (if (keyword? attribute-x) (datset-index-attr dataset attribute-x) attribute-x)
+  (let [attr-x (if (keyword? attribute-x) (datset-index-attr dataset attribute-x) attribute-x)
         attr-y (if (keyword? attribute-y) (datset-index-attr dataset attribute-y) attribute-y)
         options-pre (first-or-default visualization-options {})
         opts (if (nil? (:visualize options-pre)) (conj options-pre {:visualize true}) options-pre)
@@ -171,30 +171,30 @@
 
 ;; Things to load to test this from slime
 
-;(defn load-test-from-slime []
-;  (do
-;    (add-classpath "file:///Users/antonio.garrote/Development/old/clj-ml/lib/joda-time-1.6.jar")
-;    (add-classpath "file:///Users/antonio.garrote/Development/old/clj-ml/lib/opencsv-2.0.1.jar")
-;    (add-classpath "file:///Users/antonio.garrote/Development/old/clj-ml/classes/")
-;    (add-classpath "file:///Applications/weka-3-6-2/weka.jar")
-;    (add-classpath "file:///Users/antonio.garrote/Development/old/clj-ml/src/")
-;    (add-classpath "file:///Users/antonio.garrote/Development/old/clj-ml/lib/incanter-charts-1.0-master-SNAPSHOT.jar")
-;    (add-classpath "file:///Users/antonio.garrote/Development/old/clj-ml/lib/incanter-core-1.0-master-SNAPSHOT.jar")
-;    (add-classpath "file:///Users/antonio.garrote/Development/old/clj-ml/lib/incanter-io-1.0-master-SNAPSHOT.jar")
-;    (add-classpath "file:///Users/antonio.garrote/Development/old/clj-ml/lib/incanter-processing-1.0-master-SNAPSHOT.jar")
-;    (add-classpath "file:///Users/antonio.garrote/Development/old/clj-ml/lib/incanter-chrono-1.0-master-SNAPSHOT.jar")
-;    (add-classpath "file:///Users/antonio.garrote/Development/old/clj-ml/lib/incanter-full-1.0-master-SNAPSHOT.jar")
-;    (add-classpath "file:///Users/antonio.garrote/Development/old/clj-ml/lib/incanter-mongodb-1.0-master-SNAPSHOT.jar")
-;    (add-classpath "file:///Users/antonio.garrote/Development/old/clj-ml/lib/jfreechart-1.0.13.jar")
-;    (add-classpath "file:///Users/antonio.garrote/Development/old/clj-ml/lib/parallelcolt-0.7.2.jar")
-;    (add-classpath "file:///Users/antonio.garrote/Development/old/clj-ml/lib/arpack-combo-0.1.jar")
-;    (add-classpath "file:///Users/antonio.garrote/Development/old/clj-ml/lib/gnujaxp-1.jar")
-;    (add-classpath "file:///Users/antonio.garrote/Development/old/clj-ml/lib/clojure-json-1.1-20091229.021828-4.jar")
-;    (add-classpath "file:///Users/antonio.garrote/Development/old/clj-ml/lib/clojure-db-object-0.1.1-20091229.021828-2.jar")
-;    (add-classpath "file:///Users/antonio.garrote/Development/old/clj-ml/lib/jcommon-1.0.16.jar")
-;    (add-classpath "file:///Users/antonio.garrote/Development/old/clj-ml/lib/netlib-java-0.9.1.jar")
-;    (add-classpath "file:///Users/antonio.garrote/Development/old/clj-ml/lib/processing-core-1.jar")
-;    (add-classpath"file:///Users/antonio.garrote/Development/old/clj-ml/lib/congomongo-0.1.1-20091229.021828-1.jar")
-;    (add-classpath"file:///Users/antonio.garrote/Development/old/clj-ml/lib/mongo-1.0.jar")
-;    (add-classpath"file:///Users/antonio.garrote/Development/old/clj-ml/lib/mongo-java-driver-1.1.0-20091229.021828-3.jar")
-;    ))
+                                        ;(defn load-test-from-slime []
+                                        ;  (do
+                                        ;    (add-classpath "file:///Users/antonio.garrote/Development/old/clj-ml/lib/joda-time-1.6.jar")
+                                        ;    (add-classpath "file:///Users/antonio.garrote/Development/old/clj-ml/lib/opencsv-2.0.1.jar")
+                                        ;    (add-classpath "file:///Users/antonio.garrote/Development/old/clj-ml/classes/")
+                                        ;    (add-classpath "file:///Applications/weka-3-6-2/weka.jar")
+                                        ;    (add-classpath "file:///Users/antonio.garrote/Development/old/clj-ml/src/")
+                                        ;    (add-classpath "file:///Users/antonio.garrote/Development/old/clj-ml/lib/incanter-charts-1.0-master-SNAPSHOT.jar")
+                                        ;    (add-classpath "file:///Users/antonio.garrote/Development/old/clj-ml/lib/incanter-core-1.0-master-SNAPSHOT.jar")
+                                        ;    (add-classpath "file:///Users/antonio.garrote/Development/old/clj-ml/lib/incanter-io-1.0-master-SNAPSHOT.jar")
+                                        ;    (add-classpath "file:///Users/antonio.garrote/Development/old/clj-ml/lib/incanter-processing-1.0-master-SNAPSHOT.jar")
+                                        ;    (add-classpath "file:///Users/antonio.garrote/Development/old/clj-ml/lib/incanter-chrono-1.0-master-SNAPSHOT.jar")
+                                        ;    (add-classpath "file:///Users/antonio.garrote/Development/old/clj-ml/lib/incanter-full-1.0-master-SNAPSHOT.jar")
+                                        ;    (add-classpath "file:///Users/antonio.garrote/Development/old/clj-ml/lib/incanter-mongodb-1.0-master-SNAPSHOT.jar")
+                                        ;    (add-classpath "file:///Users/antonio.garrote/Development/old/clj-ml/lib/jfreechart-1.0.13.jar")
+                                        ;    (add-classpath "file:///Users/antonio.garrote/Development/old/clj-ml/lib/parallelcolt-0.7.2.jar")
+                                        ;    (add-classpath "file:///Users/antonio.garrote/Development/old/clj-ml/lib/arpack-combo-0.1.jar")
+                                        ;    (add-classpath "file:///Users/antonio.garrote/Development/old/clj-ml/lib/gnujaxp-1.jar")
+                                        ;    (add-classpath "file:///Users/antonio.garrote/Development/old/clj-ml/lib/clojure-json-1.1-20091229.021828-4.jar")
+                                        ;    (add-classpath "file:///Users/antonio.garrote/Development/old/clj-ml/lib/clojure-db-object-0.1.1-20091229.021828-2.jar")
+                                        ;    (add-classpath "file:///Users/antonio.garrote/Development/old/clj-ml/lib/jcommon-1.0.16.jar")
+                                        ;    (add-classpath "file:///Users/antonio.garrote/Development/old/clj-ml/lib/netlib-java-0.9.1.jar")
+                                        ;    (add-classpath "file:///Users/antonio.garrote/Development/old/clj-ml/lib/processing-core-1.jar")
+                                        ;    (add-classpath"file:///Users/antonio.garrote/Development/old/clj-ml/lib/congomongo-0.1.1-20091229.021828-1.jar")
+                                        ;    (add-classpath"file:///Users/antonio.garrote/Development/old/clj-ml/lib/mongo-1.0.jar")
+                                        ;    (add-classpath"file:///Users/antonio.garrote/Development/old/clj-ml/lib/mongo-java-driver-1.1.0-20091229.021828-3.jar")
+                                        ;    ))

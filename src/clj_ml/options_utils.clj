@@ -15,7 +15,7 @@
   "Sets an option for a filter"
   (if (get map val)
     (conj opts flag)
-      opts))
+    opts))
 
 (defn check-option-value [opts val flag map]
   "Sets an option with value for a filter"
@@ -48,7 +48,7 @@
        [])))
 
 
-; TODO: Raise a helpful exception when the keys don't match up with the provided flags.
+;; TODO: Raise a helpful exception when the keys don't match up with the provided flags.
 (defn check-options
   "Checks the presence of a set of options for a filter"
   ([args-map opts-map]

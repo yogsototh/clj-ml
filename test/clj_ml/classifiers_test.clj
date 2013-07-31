@@ -44,9 +44,9 @@
 
 (deftest make-classifier-bayes
   (fact
-    (let [c (clj-ml.classifiers/make-classifier :bayes :naive {:kernel-estimator true :old-format true})
-          opts (vec (.getOptions c))]
-      opts => (contains ["-K" "-O"]))))
+   (let [c (clj-ml.classifiers/make-classifier :bayes :naive {:kernel-estimator true :old-format true})
+         opts (vec (.getOptions c))]
+     opts => (contains ["-K" "-O"]))))
 
 (deftest make-classifier-bayes-updateable
   (let [c (clj-ml.classifiers/make-classifier :bayes :naive {:updateable true})]

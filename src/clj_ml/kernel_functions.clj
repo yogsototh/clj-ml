@@ -18,8 +18,8 @@
 (defmethod make-kernel-function-options :polynomic
   ([kind map]
      (let [cols-val (check-option-values map {:cache-size "-C"
-                                          :exponent "-E"
-                                          :use=lower-order-terms "-L"}
+                                              :exponent "-E"
+                                              :use=lower-order-terms "-L"}
                                          [""])]
        (into-array cols-val))))
 

@@ -20,6 +20,6 @@
                            [4 5 :g]])
         attrs (select-attributes ds :search (greedy) :evaluator (cfs-subset-eval))]
     (facts
-      attrs => [:a :c]
-      (-> attrs meta :selector class) => #(isa? weka.attributeSelection.AttributeSelection %))))
+     attrs => [:a :c]
+     (-> attrs meta :selector class) => #(isa? weka.attributeSelection.AttributeSelection %))))
 

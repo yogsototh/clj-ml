@@ -7,33 +7,33 @@
                               [:a :b]
                               1)
         inst (make-instance dataset [1 2])]
-  (is (= (class inst)
-         weka.core.Instance))
-  (is (= 2 (.numValues inst)))
-  (is (= 1.0 (.value inst 0)))
-  (is (= 2.0 (.value inst 1)))))
+    (is (= (class inst)
+           weka.core.Instance))
+    (is (= 2 (.numValues inst)))
+    (is (= 1.0 (.value inst 0)))
+    (is (= 2.0 (.value inst 1)))))
 
 (deftest make-instance-ord
   (let [dataset (make-dataset :test
                               [:a {:b [:b1 :b2]}]
                               1)
         inst (make-instance dataset [1 :b1])]
-  (is (= (class inst)
-         weka.core.Instance))
-  (is (= 2 (.numValues inst)))
-  (is (= 1.0 (.value inst 0)))
-  (is (= "b1" (.stringValue inst 1)))))
+    (is (= (class inst)
+           weka.core.Instance))
+    (is (= 2 (.numValues inst)))
+    (is (= 1.0 (.value inst 0)))
+    (is (= "b1" (.stringValue inst 1)))))
 
 (deftest make-instance-nils
   (let [dataset (make-dataset :test
                               [:a :b]
                               1)
         inst (make-instance dataset [1 nil])]
-  (is (= (class inst)
-         weka.core.Instance))
-  (is (= 2 (.numValues inst)))
-  (is (= 1.0 (.value inst 0)))
-  (is (Double/isNaN (.value inst 1)))))
+    (is (= (class inst)
+           weka.core.Instance))
+    (is (= 2 (.numValues inst)))
+    (is (= 1.0 (.value inst 0)))
+    (is (Double/isNaN (.value inst 1)))))
 
 (deftest dataset-make-dataset-with-default-class
   (let [ds (clj-ml.data/make-dataset :test [:a :b {:c [:d :e]}] [] {:class :c})
@@ -48,7 +48,7 @@
   (let [dataset (make-dataset :test
                               [:a :b]
                               2)
-         _ (clj-ml.data/dataset-set-class dataset 1)]
+        _ (clj-ml.data/dataset-set-class dataset 1)]
     (is (= 1 (.classIndex dataset)))
     (is (= 0 (.classIndex (dataset-set-class dataset 0))))
     (testing "when a string or symbol is passed in"

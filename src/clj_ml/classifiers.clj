@@ -234,44 +234,44 @@
 (defmethod make-classifier-options [:decision-tree :random-forest]
   ([kind algorithm m]
      (->>
-       (check-options m {:debug "-D"})
-       (check-option-values m
-                               {:num-trees-in-forest "-I"
-                                :num-features-to-consider "-K"
-                                :random-seed "-S"
-                                :depth "-depth"}))))
+      (check-options m {:debug "-D"})
+      (check-option-values m
+                           {:num-trees-in-forest "-I"
+                            :num-features-to-consider "-K"
+                            :random-seed "-S"
+                            :depth "-depth"}))))
 
 (defmethod make-classifier-options [:decision-tree :fast-random-forest]
   ([kind algorithm m]
      (->>
-       (check-options m {:debug "-D"})
-       (check-option-values m
-                               {:num-trees-in-forest "-I"
-                                :num-features-to-consider "-K"
-                                :random-seed "-S"
-                                :depth "-depth"}))))
+      (check-options m {:debug "-D"})
+      (check-option-values m
+                           {:num-trees-in-forest "-I"
+                            :num-features-to-consider "-K"
+                            :random-seed "-S"
+                            :depth "-depth"}))))
 
 (defmethod make-classifier-options [:decision-tree :rotation-forest]
   ([kind algorithm m]
      (->>
-       (check-options m {:debug "-D"})
-       (check-option-values m
-                               {:num-iterations "-I"
-                                :use-number-of-groups "-N"
-                                :min-attribute-group-size "-G"
-                                :max-attribute-group-size "-H"
-                                :percentage-of-instances-to-remove "-P"
-                                :filter "-F"
-                                :random-seed "-S"
-                                :weak-learning-class "-W"}))))
+      (check-options m {:debug "-D"})
+      (check-option-values m
+                           {:num-iterations "-I"
+                            :use-number-of-groups "-N"
+                            :min-attribute-group-size "-G"
+                            :max-attribute-group-size "-H"
+                            :percentage-of-instances-to-remove "-P"
+                            :filter "-F"
+                            :random-seed "-S"
+                            :weak-learning-class "-W"}))))
 
 (defmethod make-classifier-options [:decision-tree :m5p]
   ([kind algorithm m]
      (->>
-       (check-options m {:unsmoothed-predictions "-U"
-                         :regression "-R"
-                         :unpruned "-N"})
-       (check-option-values m {:minimum-instances "-M"}))))
+      (check-options m {:unsmoothed-predictions "-U"
+                        :regression "-R"
+                        :unpruned "-N"})
+      (check-option-values m {:minimum-instances "-M"}))))
 
 
 
@@ -281,11 +281,11 @@
 (defn make-classifier-with
   #^{:skip-wiki true}
   [kind algorithm ^Class classifier-class options]
-     (let [options-read (if (empty? options)  {} (first options))
-            ^Classifier classifier (.newInstance classifier-class)
-           opts (into-array String (make-classifier-options kind algorithm options-read))]
-       (.setOptions classifier opts)
-        classifier))
+  (let [options-read (if (empty? options)  {} (first options))
+        ^Classifier classifier (.newInstance classifier-class)
+        opts (into-array String (make-classifier-options kind algorithm options-read))]
+    (.setOptions classifier opts)
+    classifier))
 
 (defmulti make-classifier
   "Creates a new classifier for the given kind algorithm and options.
@@ -486,14 +486,14 @@
            opts (into-array String (make-classifier-options :support-vector-machine :smo options-read))]
        (.setOptions classifier opts)
        (when (not (empty? (get options-read :kernel-function)))
-          ;; We have to setup a different kernel function
+         ;; We have to setup a different kernel function
          (let [kernel (get options-read :kernel-function)
-                real-kernel (if (map? kernel)
+               real-kernel (if (map? kernel)
                              (make-kernel-function (first (keys kernel))
                                                    (first (vals kernel)))
                              kernel)]
-            (.setKernel classifier real-kernel)))
-        classifier)))
+           (.setKernel classifier real-kernel)))
+       classifier)))
 
 (defmethod make-classifier [:support-vector-machine :spegasos]
   ([kind algorithm & options]

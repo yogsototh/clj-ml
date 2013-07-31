@@ -4,4 +4,4 @@
 
 (deftest test-into-fast-vecotor
   (is (= ["a" "B" "c"]
-           (vec (.toArray (into-fast-vector ["a" "B" "c"]))))))
+         (vec (.toArray (into-fast-vector ["a" "B" "c"]))))))

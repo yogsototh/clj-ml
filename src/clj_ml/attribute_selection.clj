@@ -16,40 +16,40 @@
   "Creates the right parameters for a weka object. Returns a clojure vector."
   (fn [kind map] kind))
 
-;TODO: consider passing in the make-filter-options body here as well in additon to the docstring.
+                                        ;TODO: consider passing in the make-filter-options body here as well in additon to the docstring.
 #_(defmacro defsearch
-  "Defines the filter's fn that creates a fn to make and apply the filter."
-  [filter-name]
-  (let [search-keyword (keyword filter-name)]
-    `(do
-       (defn ~search-name
-         ([ds#]
-            (make-apply-filter ~filter-keyword {} ds#))
-         ([ds# attributes#]
-            (make-apply-filter ~filter-keyword attributes# ds#))))))
+    "Defines the filter's fn that creates a fn to make and apply the filter."
+    [filter-name]
+    (let [search-keyword (keyword filter-name)]
+      `(do
+         (defn ~search-name
+           ([ds#]
+              (make-apply-filter ~filter-keyword {} ds#))
+           ([ds# attributes#]
+              (make-apply-filter ~filter-keyword attributes# ds#))))))
 
 (defmethod make-obj-options :greedy
-;;   -C
-;;  Use conservative forward search
-;;
-;; -B
-;;  Use a backward search instead of a
-;;  forward one.
-;;
-;; -P <start set>
-;;  Specify a starting set of attributes.
-;;  Eg. 1,3,5-7.
-;;
-;; -R
-;;  Produce a ranked list of attributes.
-;;
-;; -T <threshold>
-;;  Specify a theshold by which attributes
-;;  may be discarded from the ranking.
-;;  Use in conjuction with -R
-;;
-;; -N <num to select>
-;;  Specify number of attributes to select
+  ;;   -C
+  ;;  Use conservative forward search
+  ;;
+  ;; -B
+  ;;  Use a backward search instead of a
+  ;;  forward one.
+  ;;
+  ;; -P <start set>
+  ;;  Specify a starting set of attributes.
+  ;;  Eg. 1,3,5-7.
+  ;;
+  ;; -R
+  ;;  Produce a ranked list of attributes.
+  ;;
+  ;; -T <threshold>
+  ;;  Specify a theshold by which attributes
+  ;;  may be discarded from the ranking.
+  ;;  Use in conjuction with -R
+  ;;
+  ;; -N <num to select>
+  ;;  Specify number of attributes to select
 
   ([kind m]
      (let [weka-opts (->> (extract-attributes "-P" :starting-attributes)
@@ -58,11 +58,11 @@
                           (check-option-values m
                                                {:threshold "-T"
                                                 :num-attributes "-N"}))]
-          (case (m :direction)
-             :forward weka-opts
-             :conservative-forward (conj weka-opts "-C")
-             :backward (conj weka-opts "-B")
-             weka-opts))))
+       (case (m :direction)
+         :forward weka-opts
+         :conservative-forward (conj weka-opts "-C")
+         :backward (conj weka-opts "-B")
+         weka-opts))))
 
 
 ;; Sketch of what would be nice to have...
@@ -76,45 +76,45 @@
 ;;  -C :direction ...)
 
 (defmethod make-obj-options :linear-forward
-;; LinearForwardSelection:
-;;
-;; Extension of BestFirst. Takes a restricted number of k attributes into account. Fixed-set selects a fixed number k of attributes, whereas k is increased in each step when fixed-width is selected. The search uses either the initial ordering to select the top k attributes, or performs a ranking (with the same evalutator the search uses later on). The search direction can be forward, or floating forward selection (with opitional backward search steps).
-;;
-;; For more information see:
-;;
-;; Martin Guetlein (2006). Large Scale Attribute Selection Using Wrappers. Freiburg, Germany.
-;;
-;; Valid options are:
-;;
-;;  -P <start set>
-;;   Specify a starting set of attributes.
-;;   Eg. 1,3,5-7.
-;;
-;;  -D <0 = forward selection | 1 = floating forward selection>
-;;   Forward selection method. (default = 0).
-;;
-;;  -N <num>
-;;   Number of non-improving nodes to
-;;   consider before terminating search.
-;;
-;;  -I
-;;   Perform initial ranking to select the
-;;   top-ranked attributes.
-;;
-;;  -K <num>
-;;   Number of top-ranked attributes that are
-;;   taken into account by the search.
-;;
-;;  -T <0 = fixed-set | 1 = fixed-width>
-;;   Type of Linear Forward Selection (default = 0).
-;;
-;;  -S <num>
-;;   Size of lookup cache for evaluated subsets.
-;;   Expressed as a multiple of the number of
-;;   attributes in the data set. (default = 1)
-;;
-;;  -Z
-;;   verbose on/off
+  ;; LinearForwardSelection:
+  ;;
+  ;; Extension of BestFirst. Takes a restricted number of k attributes into account. Fixed-set selects a fixed number k of attributes, whereas k is increased in each step when fixed-width is selected. The search uses either the initial ordering to select the top k attributes, or performs a ranking (with the same evalutator the search uses later on). The search direction can be forward, or floating forward selection (with opitional backward search steps).
+  ;;
+  ;; For more information see:
+  ;;
+  ;; Martin Guetlein (2006). Large Scale Attribute Selection Using Wrappers. Freiburg, Germany.
+  ;;
+  ;; Valid options are:
+  ;;
+  ;;  -P <start set>
+  ;;   Specify a starting set of attributes.
+  ;;   Eg. 1,3,5-7.
+  ;;
+  ;;  -D <0 = forward selection | 1 = floating forward selection>
+  ;;   Forward selection method. (default = 0).
+  ;;
+  ;;  -N <num>
+  ;;   Number of non-improving nodes to
+  ;;   consider before terminating search.
+  ;;
+  ;;  -I
+  ;;   Perform initial ranking to select the
+  ;;   top-ranked attributes.
+  ;;
+  ;;  -K <num>
+  ;;   Number of top-ranked attributes that are
+  ;;   taken into account by the search.
+  ;;
+  ;;  -T <0 = fixed-set | 1 = fixed-width>
+  ;;   Type of Linear Forward Selection (default = 0).
+  ;;
+  ;;  -S <num>
+  ;;   Size of lookup cache for evaluated subsets.
+  ;;   Expressed as a multiple of the number of
+  ;;   attributes in the data set. (default = 1)
+  ;;
+  ;;  -Z
+  ;;   verbose on/off
   ([kind m]
      (let [weka-opts (->>
                       (extract-attributes "-P" :starting-attributes)
@@ -123,11 +123,11 @@
                                            {:num-non-inproving "-N"
                                             :num-attrs-in-search "-K"
                                             :subset-eval-cache-size "-S"}))]
-         (conj weka-opts "-D" (case (m :direction)
-                                  :backward "0"
-                                  :forward "1"
-                                  :bi-directional "2"
-                                  "1"))
+       (conj weka-opts "-D" (case (m :direction)
+                              :backward "0"
+                              :forward "1"
+                              :bi-directional "2"
+                              "1"))
        )))
 
 (defmethod make-obj-options :best-first
@@ -155,79 +155,79 @@
   ;;   Size of lookup cache for evaluated subsets.
   ;;   Expressed as a multiple of the number of
   ;;   attributes in the data set. (default = 1)
-   ([kind m]
+  ([kind m]
      (let [weka-opts (->> (extract-attributes "-P" :starting-attributes)
                           (check-option-values m
                                                {:num-non-inproving "-N"
                                                 :subset-eval-cache-size "-S"}))]
        (conj weka-opts "-D" (case (m :direction)
-                                  :backward "0"
-                                  :forward "1"
-                                  :bi-directional "2"
-                                  "1")))))
+                              :backward "0"
+                              :forward "1"
+                              :bi-directional "2"
+                              "1")))))
 
 (defmethod make-obj-options :genetic
-;; GeneticSearch:
-;;
-;; Performs a search using the simple genetic algorithm described in Goldberg (1989).
-;;
-;; For more information see:
-;;
-;; David E. Goldberg (1989). Genetic algorithms in search, optimization and machine learning. Addison-Wesley.
-;;
-;; BibTeX:
-;;
-;;  @book{Goldberg1989,
-;;     author = {David E. Goldberg},
-;;     publisher = {Addison-Wesley},
-;;     title = {Genetic algorithms in search, optimization and machine learning},
-;;     year = {1989},
-;;     ISBN = {0201157675}
-;;  }
-;;
-;;
-;; Valid options are:
-;;
-;;  -P <start set>
-;;   Specify a starting set of attributes.
-;;   Eg. 1,3,5-7.If supplied, the starting set becomes
-;;   one member of the initial random
-;;   population.
-;;
-;;  -Z <population size>
-;;   Set the size of the population (even number).
-;;   (default = 20).
-;;
-;;  -G <number of generations>
-;;   Set the number of generations.
-;;   (default = 20)
-;;
-;;  -C <probability of crossover>
-;;   Set the probability of crossover.
-;;   (default = 0.6)
-;;
-;;  -M <probability of mutation>
-;;   Set the probability of mutation.
-;;   (default = 0.033)
-;;
-;;  -R <report frequency>
-;;   Set frequency of generation reports.
-;;   e.g, setting the value to 5 will
-;;   report every 5th generation
-;;   (default = number of generations)
-;;
-;;  -S <seed>
-;;   Set the random number seed.
-;;   (default = 1)
-   ([kind m]
-      (->> (extract-attributes "-P" :starting-attributes)
-           (check-option-values m
-                                {:population-size "-Z"
-                                 :num-generations "-G"
-                                 :crossover-prob "-C"
-                                 :mutation-prob "-M"
-                                 :report-freq "-R"
-                                 :random-seed "-S"}))))
+  ;; GeneticSearch:
+  ;;
+  ;; Performs a search using the simple genetic algorithm described in Goldberg (1989).
+  ;;
+  ;; For more information see:
+  ;;
+  ;; David E. Goldberg (1989). Genetic algorithms in search, optimization and machine learning. Addison-Wesley.
+  ;;
+  ;; BibTeX:
+  ;;
+  ;;  @book{Goldberg1989,
+  ;;     author = {David E. Goldberg},
+  ;;     publisher = {Addison-Wesley},
+  ;;     title = {Genetic algorithms in search, optimization and machine learning},
+  ;;     year = {1989},
+  ;;     ISBN = {0201157675}
+  ;;  }
+  ;;
+  ;;
+  ;; Valid options are:
+  ;;
+  ;;  -P <start set>
+  ;;   Specify a starting set of attributes.
+  ;;   Eg. 1,3,5-7.If supplied, the starting set becomes
+  ;;   one member of the initial random
+  ;;   population.
+  ;;
+  ;;  -Z <population size>
+  ;;   Set the size of the population (even number).
+  ;;   (default = 20).
+  ;;
+  ;;  -G <number of generations>
+  ;;   Set the number of generations.
+  ;;   (default = 20)
+  ;;
+  ;;  -C <probability of crossover>
+  ;;   Set the probability of crossover.
+  ;;   (default = 0.6)
+  ;;
+  ;;  -M <probability of mutation>
+  ;;   Set the probability of mutation.
+  ;;   (default = 0.033)
+  ;;
+  ;;  -R <report frequency>
+  ;;   Set frequency of generation reports.
+  ;;   e.g, setting the value to 5 will
+  ;;   report every 5th generation
+  ;;   (default = number of generations)
+  ;;
+  ;;  -S <seed>
+  ;;   Set the random number seed.
+  ;;   (default = 1)
+  ([kind m]
+     (->> (extract-attributes "-P" :starting-attributes)
+          (check-option-values m
+                               {:population-size "-Z"
+                                :num-generations "-G"
+                                :crossover-prob "-C"
+                                :mutation-prob "-M"
+                                :report-freq "-R"
+                                :random-seed "-S"}))))
 
 (defmethod make-obj-options :cfs-subset-eval
   ;; CfsSubsetEval :
@@ -258,37 +258,37 @@
   ;;
   ;;  -L
   ;;  Don't include locally predictive attributes.
-   ([kind m]
-      (check-options m
-                     {:treat-missing-vals-separate "-M"
-                      :ignore-locally-predictive-attrs "-L"})))
+  ([kind m]
+     (check-options m
+                    {:treat-missing-vals-separate "-M"
+                     :ignore-locally-predictive-attrs "-L"})))
 
 (defn attribute-eval-options [m]
-;; Valid options are:
-;;
-;;  -M
-;;   treat missing values as a seperate value.
-;;
-;;  -B
-;;   just binarize numeric attributes instead
-;;   of properly discretizing them.
-   (check-options m
-                     {:treat-missing-vals-separate "-M"
-                      :binarize-numeric-attrs "-B"}))
+  ;; Valid options are:
+  ;;
+  ;;  -M
+  ;;   treat missing values as a seperate value.
+  ;;
+  ;;  -B
+  ;;   just binarize numeric attributes instead
+  ;;   of properly discretizing them.
+  (check-options m
+                 {:treat-missing-vals-separate "-M"
+                  :binarize-numeric-attrs "-B"}))
 
 (defmethod make-obj-options :info-gain
-;;   InfoGainAttributeEval :
-;;
-;; Evaluates the worth of an attribute by measuring the information gain with respect to the class.
-;;
-;; InfoGain(Class,Attribute) = H(Class) - H(Class | Attribute).
+  ;;   InfoGainAttributeEval :
+  ;;
+  ;; Evaluates the worth of an attribute by measuring the information gain with respect to the class.
+  ;;
+  ;; InfoGain(Class,Attribute) = H(Class) - H(Class | Attribute).
   ([kind m]
      (attribute-eval-options m)))
 
 (defmethod make-obj-options :chi-squared
-;; ChiSquaredAttributeEval :
-;;
-;; Evaluates the worth of an attribute by computing the value of the chi-squared statistic with respect to the class.
+  ;; ChiSquaredAttributeEval :
+  ;;
+  ;; Evaluates the worth of an attribute by computing the value of the chi-squared statistic with respect to the class.
   ([kind m]
      (attribute-eval-options m)))
 
@@ -298,8 +298,8 @@
   ;;
   ;; GainR(Class, Attribute) = (H(Class) - H(Class | Attribute)) / H(Attribute).
   ([kind m]
-      (check-options m
-                     {:treat-missing-vals-separate "-M"})))
+     (check-options m
+                    {:treat-missing-vals-separate "-M"})))
 
 
 (defmethod make-obj-options :symmetrical-uncert
@@ -310,67 +310,67 @@
   ;; SymmU(Class, Attribute) = 2 * (H(Class) - H(Class | Attribute)) / H(Class) + H(Attribute).
   ;;
   ([kind m]
-      (check-options m
-                     {:treat-missing-vals-separate "-M"})))
+     (check-options m
+                    {:treat-missing-vals-separate "-M"})))
 
 (defmethod make-obj-options :relief
- ;; ReliefFAttributeEval :
- ;;
- ;; Evaluates the worth of an attribute by repeatedly sampling an instance and considering the value of the given attribute for the nearest instance of the same and different class. Can operate on both discrete and continuous class data.
- ;; -M <num instances>
- ;;  Specify the number of instances to
- ;;  sample when estimating attributes.
- ;;  If not specified, then all instances
- ;;  will be used.
- ;;
- ;; -D <seed>
- ;;  Seed for randomly sampling instances.
- ;;  (Default = 1)
- ;;
- ;; -K <number of neighbours>
- ;;  Number of nearest neighbours (k) used
- ;;  to estimate attribute relevances
- ;;  (Default = 10).
- ;;
- ;; -W
- ;;  Weight nearest neighbours by distance
- ;;
- ;; -A <num>
- ;;  Specify sigma value (used in an exp
- ;;  function to control how quickly
- ;;  weights for more distant instances
- ;;  decrease. Use in conjunction with -W.
- ;;  Sensible value=1/5 to 1/10 of the
- ;;  number of nearest neighbours.
- ;;  (Default = 2)
-   ([kind m]
-      (->> (extract-attributes "-P" :starting-attributes)
-           (check-options {:weight "-W"})
-           (check-option-values m
-                                {:num-instances "-M"
-                                 :random-seed "-D"
-                                 :number-of-neighbors "-K"
-                                 :weight-sigma "-A"}))))
+  ;; ReliefFAttributeEval :
+  ;;
+  ;; Evaluates the worth of an attribute by repeatedly sampling an instance and considering the value of the given attribute for the nearest instance of the same and different class. Can operate on both discrete and continuous class data.
+  ;; -M <num instances>
+  ;;  Specify the number of instances to
+  ;;  sample when estimating attributes.
+  ;;  If not specified, then all instances
+  ;;  will be used.
+  ;;
+  ;; -D <seed>
+  ;;  Seed for randomly sampling instances.
+  ;;  (Default = 1)
+  ;;
+  ;; -K <number of neighbours>
+  ;;  Number of nearest neighbours (k) used
+  ;;  to estimate attribute relevances
+  ;;  (Default = 10).
+  ;;
+  ;; -W
+  ;;  Weight nearest neighbours by distance
+  ;;
+  ;; -A <num>
+  ;;  Specify sigma value (used in an exp
+  ;;  function to control how quickly
+  ;;  weights for more distant instances
+  ;;  decrease. Use in conjunction with -W.
+  ;;  Sensible value=1/5 to 1/10 of the
+  ;;  number of nearest neighbours.
+  ;;  (Default = 2)
+  ([kind m]
+     (->> (extract-attributes "-P" :starting-attributes)
+          (check-options {:weight "-W"})
+          (check-option-values m
+                               {:num-instances "-M"
+                                :random-seed "-D"
+                                :number-of-neighbors "-K"
+                                :weight-sigma "-A"}))))
 
 (defmethod make-obj-options :ranker
-;; Ranker :
-;;
-;; Ranks attributes by their individual evaluations. Use in conjunction with attribute evaluators (ReliefF, GainRatio, Entropy etc).
-;;
-;; Valid options are:
-;;
-;;  -P <start set>
-;;   Specify a starting set of attributes.
-;;   Eg. 1,3,5-7.
-;;   Any starting attributes specified are
-;;   ignored during the ranking.
-;;
-;;  -T <threshold>
-;;   Specify a theshold by which attributes
-;;   may be discarded from the ranking.
-;;
-;;  -N <num to select>
-;;   Specify number of attributes to select
+  ;; Ranker :
+  ;;
+  ;; Ranks attributes by their individual evaluations. Use in conjunction with attribute evaluators (ReliefF, GainRatio, Entropy etc).
+  ;;
+  ;; Valid options are:
+  ;;
+  ;;  -P <start set>
+  ;;   Specify a starting set of attributes.
+  ;;   Eg. 1,3,5-7.
+  ;;   Any starting attributes specified are
+  ;;   ignored during the ranking.
+  ;;
+  ;;  -T <threshold>
+  ;;   Specify a theshold by which attributes
+  ;;   may be discarded from the ranking.
+  ;;
+  ;;  -N <num to select>
+  ;;   Specify number of attributes to select
   ([kind m]
      (->> (extract-attributes "-P" :starting-attributes)
           (check-option-values m
@@ -380,26 +380,26 @@
 
 
 (defmethod make-obj-options :one-R
-;; OneRAttributeEval :
-;;
-;; Evaluates the worth of an attribute by using the OneR classifier.
-;;
-;; Valid options are:
-;;
-;;  -S <seed>
-;;   Random number seed for cross validation
-;;   (default = 1)
-;;
-;;  -F <folds>
-;;   Number of folds for cross validation
-;;   (default = 10)
-;;
-;;  -D
-;;   Use training data for evaluation rather than cross validaton
-;;
-;;  -B <minimum bucket size>
-;;   Minimum number of objects in a bucket
-;;   (passed on to OneR, default = 6)
+  ;; OneRAttributeEval :
+  ;;
+  ;; Evaluates the worth of an attribute by using the OneR classifier.
+  ;;
+  ;; Valid options are:
+  ;;
+  ;;  -S <seed>
+  ;;   Random number seed for cross validation
+  ;;   (default = 1)
+  ;;
+  ;;  -F <folds>
+  ;;   Number of folds for cross validation
+  ;;   (default = 10)
+  ;;
+  ;;  -D
+  ;;   Use training data for evaluation rather than cross validaton
+  ;;
+  ;;  -B <minimum bucket size>
+  ;;   Minimum number of objects in a bucket
+  ;;   (passed on to OneR, default = 6)
   ([kind m]
      (->> (check-options m {:use-training-data-for-eval "-D"})
           (check-option-values m

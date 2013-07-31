@@ -28,14 +28,14 @@
 (defmethod make-clusterer-options :k-means
   ([kind m]
      (let [cols-val (check-options m {:display-standard-deviation "-V"
-                                    :replace-missing-values "-M"
+                                      :replace-missing-values "-M"
                                       :preserve-instances-order "-O"}
                                    [""])
            cols-val-a (check-option-values m {:number-clusters "-N"
                                               :random-seed "-S"
                                               :number-iterations "-I"}
                                            cols-val)]
-    (into-array cols-val-a))))
+       (into-array cols-val-a))))
 
 
 (defmethod make-clusterer-options :cobweb
@@ -44,7 +44,7 @@
                                               :cutoff "-C"
                                               :random-seed "-S"}
                                            [""])]
-    (into-array cols-val-a))))
+       (into-array cols-val-a))))
 
 
 (defmethod make-clusterer-options :expectation-maximization
@@ -54,7 +54,7 @@
                                               :minimum-standard-deviation "-M"
                                               :random-seed "-S"}
                                            [""])]
-    (into-array cols-val-a))))
+       (into-array cols-val-a))))
 
 
 ;; Building clusterers
@@ -244,7 +244,7 @@
                                                                 training-data
                                                                 folds
                                                                 (new Random (.getTime (new Date))))]
-     {:log-likelihood log-likelihood})))
+       {:log-likelihood log-likelihood})))
 
 
 ;; Clustering collections
