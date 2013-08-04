@@ -117,3 +117,15 @@
            obj (.readObject is)]
        (.close is)
        obj)))
+
+;; capture stdout and stderr for noisy operations
+(defmacro capture-out-err [& body]
+  `(let [console-out# System/out
+         console-err# System/err
+         ps# (java.io.PrintStream. (java.io.ByteArrayOutputStream.))]
+     (System/setErr ps#)
+     (System/setOut ps#)
+     (let [result# (do ~@body)]
+       (System/setErr console-err#)
+       (System/setOut console-out#)
+       result#)))

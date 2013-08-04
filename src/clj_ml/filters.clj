@@ -567,14 +567,15 @@
    For examples on how to use the filters, especially the clojure filters, you may
    refer to filters_test.clj of clj-ml."
   [kind options]
-  (let [^Filter filter (if-let [^Class class (kind filter-aliases)]
-                         (let [^OptionHandler f (.newInstance class)]
-                           (.setOptions f (into-array String (make-filter-options kind options)))
-                           f)
-                         (case kind
-                           :clj-streamable (ClojureStreamFilter. (:process options) (:determine-dataset-format options))
-                           :clj-batch (ClojureBatchFilter. (:process options) (:determine-dataset-format options))))]
-    (doto filter (.setInputFormat (:dataset-format options)))))
+  (capture-out-err
+   (let [^Filter filter (if-let [^Class class (kind filter-aliases)]
+                          (let [^OptionHandler f (.newInstance class)]
+                            (.setOptions f (into-array String (make-filter-options kind options)))
+                            f)
+                          (case kind
+                            :clj-streamable (ClojureStreamFilter. (:process options) (:determine-dataset-format options))
+                            :clj-batch (ClojureBatchFilter. (:process options) (:determine-dataset-format options))))]
+     (doto filter (.setInputFormat (:dataset-format options))))))
 
 ;; Processing the filtering of data
 

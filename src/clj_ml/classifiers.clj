@@ -281,11 +281,12 @@
 (defn make-classifier-with
   #^{:skip-wiki true}
   [kind algorithm ^Class classifier-class options]
-  (let [options-read (if (empty? options)  {} (first options))
-        ^Classifier classifier (.newInstance classifier-class)
-        opts (into-array String (make-classifier-options kind algorithm options-read))]
-    (.setOptions classifier opts)
-    classifier))
+  (capture-out-err
+   (let [options-read (if (empty? options) {} (first options))
+         ^Classifier classifier (.newInstance classifier-class)
+         opts (into-array String (make-classifier-options kind algorithm options-read))]
+     (.setOptions classifier opts)
+     classifier)))
 
 (defmulti make-classifier
   "Creates a new classifier for the given kind algorithm and options.
@@ -677,26 +678,28 @@
 
 (defmethod classifier-evaluate :dataset
   ([^Classifier classifier mode & [training-data test-data]]
-     (letfn [(eval-fn [c]
-               (let [evaluation (new Evaluation training-data)
-                     class-labels (dataset-class-labels training-data)]
-                 (.evaluateModel evaluation c test-data (into-array []))
-                 (collect-evaluation-results class-labels evaluation)))]
-       (if (seq? classifier)
-         (last (sort-by :correct (map eval-fn classifier)))
-         (eval-fn classifier)))))
+     (capture-out-err
+      (letfn [(eval-fn [c]
+                (let [evaluation (new Evaluation training-data)
+                      class-labels (dataset-class-labels training-data)]
+                  (.evaluateModel evaluation c test-data (into-array []))
+                  (collect-evaluation-results class-labels evaluation)))]
+        (if (seq? classifier)
+          (last (sort-by :correct (map eval-fn classifier)))
+          (eval-fn classifier))))))
 
 (defmethod classifier-evaluate :cross-validation
   ([classifier mode & [training-data folds]]
-     (letfn [(eval-fn [c]
-               (let [evaluation (new Evaluation training-data)
-                     class-labels (dataset-class-labels training-data)]
-                 (.crossValidateModel evaluation c training-data folds
-                                      (new Random (.getTime (new Date))) (into-array []))
-                 (collect-evaluation-results class-labels evaluation)))]
-       (if (seq? classifier)
-         (last (sort-by :correct (map eval-fn classifier)))
-         (eval-fn classifier)))))
+     (capture-out-err
+      (letfn [(eval-fn [c]
+                (let [evaluation (new Evaluation training-data)
+                      class-labels (dataset-class-labels training-data)]
+                  (.crossValidateModel evaluation c training-data folds
+                                       (new Random (.getTime (new Date))) (into-array []))
+                  (collect-evaluation-results class-labels evaluation)))]
+        (if (seq? classifier)
+          (last (sort-by :correct (map eval-fn classifier)))
+          (eval-fn classifier))))))
 
 ;; Classifying instances
 
