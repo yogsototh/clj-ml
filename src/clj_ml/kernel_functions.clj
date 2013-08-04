@@ -38,14 +38,12 @@
                             ["-N" "yes"]
                             ["-N" "no"])
                           [""])
-           _foo (println (str "pre a" pre-values-a " map " map))
            pre-values-b (if (get map :pruning)
                           (if (= (get map :pruning)
                                  :lambda)
                             (conj (conj pre-values-a "-P") "1")
                             (conj (conj pre-values-a "-P" ) "0"))
                           pre-values-a)
-           _foo (println (str "pre b" pre-values-b))
            cols-val (check-option-values map {:cache-size "-C"
                                               :internal-cache-size "-IC"
                                               :lambda "-L"
