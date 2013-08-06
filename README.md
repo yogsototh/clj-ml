@@ -485,6 +485,6 @@ MIT License
 
 ## Authors
 
-* 2010: (Antonio Garrote)[https://github.com/antoniogarrote]
-* 2010-2013: (Ben Mabey)[https://github.com/bmabey]
-* 2013: (Joshua Eckroth)[https://github.com/joshuaeckroth]
+* 2010: [Antonio Garrote](https://github.com/antoniogarrote)
+* 2010-2013: [Ben Mabey](https://github.com/bmabey)
+* 2013: [Joshua Eckroth](https://github.com/joshuaeckroth)
