@@ -491,6 +491,201 @@ user> clustered-ds
 ...
 ```
 
+## Example: Predicting survival on the Titanic
+
+https://www.kaggle.com/c/titanic-gettingStarted
+
+First globally replace all double quoted strings `""foo""` with
+backslash quoted strings: `\"foo\"`. Weka does not handle the former.
+
+```clojure
+user> (def titanicds (load-instances :csv "file:///home/josh/git/clj-ml/titanic-train.csv"))
+user> titanicds
+#<Instances @relation stream
+
+@attribute PassengerId numeric
+@attribute Survived numeric
+@attribute Pclass numeric
+@attribute Name {'Braund, Mr. Owen Harris','Cumings, Mrs. John Bradley (Florence Briggs Thayer)', ...}
+@attribute Sex {male,female}
+@attribute Age numeric
+@attribute SibSp numeric
+@attribute Parch numeric
+@attribute Ticket {'A/5 21171','PC 17599','STON/O2. 3101282',113803.0, ...}
+@attribute Fare numeric
+@attribute Cabin {C85,C123,E46,G6,C103,D56,A6,'C23 C25 C27', ...}
+@attribute Embarked {S,C,Q}
+
+@data
+1,0,3,'Braund, Mr. Owen Harris',male,22,1,0,'A/5 21171',7.25,?,S
+2,1,1,'Cumings, Mrs. John Bradley (Florence Briggs Thayer)',female,38,1,0,'PC 17599',71.2833,C85,C
+3,1,3,'Heikkinen, Miss. Laina',female,26,0,0,'STON/O2. 3101282',7.925,?,S
+4,1,1,'Futrelle, Mrs. Jacques Heath (Lily May Peel)',female,35,1,0,113803.0,53.1,C123,S
+5,0,3,'Allen, Mr. William Henry',male,35,0,0,373450.0,8.05,?,S
+6,0,3,'Moran, Mr. James',male,?,0,0,330877.0,8.4583,?,Q
+7,0,1,'McCarthy, Mr. Timothy J',male,54,0,0,17463.0,51.8625,E46,S
+8,0,3,'Palsson, Master. Gosta Leonard',male,2,3,1,349909.0,21.075,?,S
+9,1,3,'Johnson, Mrs. Oscar W (Elisabeth Vilhelmina Berg)',female,27,0,2,347742.0,11.1333,?,S
+10,1,2,'Nasser, Mrs. Nicholas (Adele Achem)',female,14,1,0,237736.0,30.0708,?,C
+11,1,3,'Sandstrom, Miss. Marguerite Rut',female,4,1,1,'PP 9549',16.7,G6,S
+...
+>
+
+#'user/titanicds
+user> (def titanicds (dataset-set-class titanicds :Survived))
+#'user/titanicds
+user> (dataset-class-index titanicds)
+1
+
+user> (def titanicds (make-apply-filter :numeric-to-nominal
+                                        {:attributes [:Survived]}
+                                        titanicds))
+#'user/titanicds
+user> titanicds
+#<Instances @relation stream-weka.filters.unsupervised.attribute.NumericToNominal-R2
+
+@attribute PassengerId numeric
+@attribute Survived {0,1}
+@attribute Pclass numeric
+...
+>
+
+user> (def titanicds (make-apply-filter :remove-attributes
+                                        {:attributes [:PassengerId :Name :Ticket :Cabin]}
+                                        titanicds))
+#'user/titanicds
+user> titanicds
+#<Instances @relation 'stream-weka.filters.unsupervised.attribute.NumericToNominal...'
+
+@attribute Survived {0,1}
+@attribute Pclass numeric
+@attribute Sex {male,female}
+@attribute Age numeric
+@attribute SibSp numeric
+@attribute Parch numeric
+@attribute Fare numeric
+@attribute Embarked {S,C,Q}
+
+@data
+0,3,male,22,1,0,7.25,S
+1,1,female,38,1,0,71.2833,C
+1,3,female,26,0,0,7.925,S
+1,1,female,35,1,0,53.1,S
+0,3,male,35,0,0,8.05,S
+0,3,male,?,0,0,8.4583,Q
+...
+>
+
+user> (dataset-class-index titanicds)
+0
+user> (dataset-class-name titanicds)
+:Survived
+
+user> (def evaluation (classifier-evaluate (make-classifier :decision-tree :random-forest)
+                                           :cross-validation titanicds 10))
+#'user/evaluation
+user> (println (:summary evaluation))
+
+Correctly Classified Instances         727               81.5937 %
+Incorrectly Classified Instances       164               18.4063 %
+Kappa statistic                          0.6039
+Mean absolute error                      0.2409
+Root mean squared error                  0.3819
+Relative absolute error                 50.9302 %
+Root relative squared error             78.532  %
+Total Number of Instances              891     
+
+nil
+user> (println (:confusion-matrix evaluation))
+=== Confusion Matrix ===
+
+   a   b   <-- classified as
+ 483  66 |   a = 0
+  98 244 |   b = 1
+
+nil
+```
+
+Ok, looks good, let's try training on the full training data and
+testing on the testing data.
+
+```clojure
+user> (def titanic-testds (load-instances :csv "file:///home/josh/git/clj-ml/titanic-test.csv"))
+
+user> (def titanic-test-passids (map (comp int :PassengerId)
+                                     (dataset-as-maps titanic-testds)))
+#'user/titanic-test-passids
+user> titanic-test-passids
+(892 893 894 895 896 897 898 899 900 ...)
+
+user> (def titanic-testds (->> titanic-testds
+                               (make-apply-filter :remove-attributes
+                                                  {:attributes [:PassengerId :Name :Ticket :Cabin]})
+                               (make-apply-filter :add-attribute
+                                                  {:type :nominal :name :Survived
+                                                   :column 0 :labels ["0" "1"]})))
+#'user/titanic-testds
+
+user> (def titanic-testds (dataset-set-class titanic-testds :Survived))
+#'user/titanic-testds
+
+user> titanic-testds
+#<Instances @relation 'stream-weka.filters.unsupervised.attribute.Remove...'
+
+@attribute Survived {0,1}
+@attribute Pclass numeric
+@attribute Sex {male,female}
+@attribute Age numeric
+@attribute SibSp numeric
+@attribute Parch numeric
+@attribute Fare numeric
+@attribute Embarked {Q,S,C}
+
+@data
+?,3,male,34.5,0,0,7.8292,Q
+?,3,female,47,1,0,7,S
+?,2,male,62,0,0,9.6875,Q
+?,3,matitanle,27,0,0,8.6625,S
+?,3,female,22,1,1,12.2875,S
+?,3,male,14,0,0,9.225,S
+?,3,female,30,0,0,7.6292,Q
+...
+>
+
+user> (def classifier (classifier-train (make-classifier :decision-tree :random-forest) titanicds))
+#'user/classifier
+
+user> (def preds (for [instance (dataset-seq titanic-testds)]
+                      (name (classifier-classify classifier instance))))
+#'user/preds
+
+user> preds
+("0" "1" "0" "0" "0" "0" "1" "0" "0" "0" ...)
+
+#'user/preds
+
+user> (spit "titanic-predictions.csv"
+            (clojure.string/join "\n" (cons "Survived,PassengerId"
+                                            (map (fn [c1 c2] (format "%s,%d" c1 c2))
+                                                 preds titanic-test-passids))))
+nil
+
+user> (println (slurp "titanic-predictions.csv"))
+Survived,PassengerId
+0,892
+1,893
+0,894
+0,895
+0,896
+0,897
+1,898
+0,899
+0,900
+0,901
+0,902
+...
+```
+
 ## Thanks YourKit!
 
 YourKit is kindly supporting open source projects with its
