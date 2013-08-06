@@ -35,13 +35,13 @@ A machine learning library for Clojure built on top of Weka and friends.
    * Multilayer perceptrons
    * Support vector machines (grid-based training), SMO, Spegasos
 
-* Regression
+ * Regression
    * Linear
    * Logistic
    * Pace
    * Additive gradient boosting
 
-* Clusterers
+ * Clusterers
    * k-Means
    * Cobweb
    * Expectation-maximization
