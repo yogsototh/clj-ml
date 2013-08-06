@@ -237,13 +237,9 @@
   ([clusterer mode & evaluation-data]
      (let [training-data (nth evaluation-data 0)
            folds (nth evaluation-data 1)
-           evaluation (let [evl (new ClusterEvaluation)]
-                        (.setClusterer evl clusterer)
-                        evl)
-           log-likelihood (ClusterEvaluation/crossValidateModel clusterer
-                                                                training-data
-                                                                folds
-                                                                (new Random (.getTime (new Date))))]
+           evaluation (doto (new ClusterEvaluation) (.setClusterer clusterer))
+           log-likelihood (ClusterEvaluation/crossValidateModel
+                           clusterer training-data folds (new Random (.getTime (new Date))))]
        {:log-likelihood log-likelihood})))
 
 
