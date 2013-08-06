@@ -15,4 +15,7 @@
                  [org.clojars.chapmanb/fast-random-forest "0.98"]]
   :profiles {:dev
              {:plugins [[lein-midje "2.0.0"]]
-              :dependencies [[midje "1.4.0"]]}})
+              :dependencies [[midje "1.4.0"]]}}
+  :codox {:output-dir "website/doc"
+          :src-dir-uri "http://github.com/joshuaeckroth/clj-ml/blob/master"
+          :src-linenum-anchor-prefix "L"})
