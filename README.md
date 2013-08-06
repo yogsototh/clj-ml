@@ -344,7 +344,7 @@ Words appearing in the dataset will only be those appearing in the
 documents (or a subset; by default, the most common 1000 words). This
 presents a problem when new documents are loaded and used in a
 classifier trained on other documents. The classifier will not know
-how to handle word attributes that are not present in the training
+how to handle word attributes that were not present in the training
 set.
 
 The `docs-to-dataset` function provides the ability to save the
