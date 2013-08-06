@@ -465,7 +465,30 @@ petalwidth        1.1987      1.418      0.244     2.0795
 
 
 >
-user> 
+
+user> (def clustered-ds (clusterer-cluster clusterer ds))
+#'user/clustered-ds
+
+user> clustered-ds
+#<ClojureInstances @relation 'clustered iris'
+
+@attribute sepallength numeric
+@attribute sepalwidth numeric
+@attribute petallength numeric
+@attribute petalwidth numeric
+@attribute class {0,1,2}
+
+@data
+5.1,3.5,1.4,0.2,1
+4.9,3,1.4,0.2,1
+4.7,3.2,1.3,0.2,1
+4.6,3.1,1.5,0.2,1
+5,3.6,1.4,0.2,1
+5.4,3.9,1.7,0.4,1
+4.6,3.4,1.4,0.3,1
+5,3.4,1.5,0.2,1
+4.4,2.9,1.4,0.2,1
+...
 ```
 
 ## Thanks YourKit!
