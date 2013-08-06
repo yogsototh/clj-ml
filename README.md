@@ -4,16 +4,6 @@ A machine learning library for Clojure built on top of Weka and friends.
 
 ## Installation
 
-In order to install the library you must first install Leiningen.
-
-### To install from source
-
-git clone the project, then run:
-
-    $ lein deps
-    $ lein javac
-    $ lein uberjar
-
 ### Installing from Clojars
 
     [cc.artifice/clj-ml "0.4.0-SNAPSHOT"]
@@ -480,12 +470,21 @@ user>
 
 ## Thanks YourKit!
 
-YourKit is kindly supporting open source projects with its full-featured Java Profiler.
-YourKit, LLC is the creator of innovative and intelligent tools for profiling
-Java and .NET applications. Take a look at YourKit's leading software products:
-<a href="http://www.yourkit.com/java/profiler/index.jsp">YourKit Java Profiler</a> and
-<a href="http://www.yourkit.com/.net/profiler/index.jsp">YourKit .NET Profiler</a>.
+YourKit is kindly supporting open source projects with its
+full-featured Java Profiler.  YourKit, LLC is the creator of
+innovative and intelligent tools for profiling Java and .NET
+applications. Take a look at YourKit's leading software products: <a
+href="http://www.yourkit.com/java/profiler/index.jsp">YourKit Java
+Profiler</a> and <a
+href="http://www.yourkit.com/.net/profiler/index.jsp">YourKit .NET
+Profiler</a>.
 
 ## License
 
 MIT License
+
+## Authors
+
+* 2010: (Antonio Garrote)[https://github.com/antoniogarrote]
+* 2010-2013: (Ben Mabey)[https://github.com/bmabey]
+* 2013: (Joshua Eckroth)[https://github.com/joshuaeckroth]
