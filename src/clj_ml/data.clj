@@ -513,16 +513,18 @@ split immediately you can use do-split-dataset."
 
 ;; text-document datasets
 
+(defn str-to-fname
+  [s]
+  (str/replace s #"\W" "_"))
+
 (defn dataset-filename
-  [datadir vocab-id term-id tag]
-  (format "%s/instances/%s-%d-%s.arff" datadir vocab-id term-id (name tag)))
+  [datadir vocab term tag]
+  (format "%s/instances/%s-%s-%s.arff" datadir (str-to-fname vocab) (str-to-fname term) (name tag)))
 
 (defn docs-to-dataset
-  [docs vocab-id vocab-name term-id term-name keep-n datadir & opts]
+  [docs vocab term keep-n datadir & opts]
   (let [parsed-opts (apply hash-map opts)
-        docs-with-term (filter (fn [doc] (some #(= term-name %)
-                                               (get-in doc [:terms vocab-name])))
-                               docs)
+        docs-with-term (filter (fn [doc] (some #{term} (get-in doc [:terms vocab]))) docs)
         docs-without-term (let [dwt (set/difference (set docs) (set docs-with-term))]
                             (if (:resample parsed-opts)
                               (take (count docs-with-term) dwt)
@@ -533,11 +535,11 @@ split immediately you can use do-split-dataset."
         ds (make-dataset
             :docs [{:class [:no :yes]} {:title nil} {:fulltext nil}]
             (for [doc docs-keep-n]
-              (let [fulltext (str/replace (.text (Jsoup/parse (or (:fulltext doc) (:extracted doc) "")))
-                                          #"\s+" " ")
+              (let [orig-fulltext (.text (Jsoup/parse (or (:fulltext doc) (:extracted doc) "")))
+                    fulltext (str/replace orig-fulltext #"\s+" " ")
                     fulltext-fixed (str/replace fulltext #"[^ \w\d]" "")
                     title (str/replace (:title doc "") #"[^ \w\d]" "")
-                    has-tid? (some #(= term-name %) (get-in doc [:terms vocab-name]))]
+                    has-tid? (some #{term} (get-in doc [:terms vocab]))]
                 [(if has-tid? :yes :no) title fulltext-fixed])))
         ds-title (let [f (filters/make-filter
                           :string-to-word-vector
@@ -553,7 +555,8 @@ split immediately you can use do-split-dataset."
                                       "weka.core.stemmers.SnowballStemmer -S English")})]
                    ;; if testing, initialize the filter with the training instances
                    (when (:testing parsed-opts)
-                     (filters/filter-apply f (load-instances :arff (file (dataset-filename datadir vocab-id term-id :orig)))))
+                     (let [ds-file (file (dataset-filename datadir vocab term :orig))]
+                       (filters/filter-apply f (load-instances :arff ds-file))))
                    (filters/filter-apply f ds))
         ds-title-fulltext (let [f (filters/make-filter
                                    :string-to-word-vector
@@ -569,12 +572,13 @@ split immediately you can use do-split-dataset."
                                                "weka.core.stemmers.SnowballStemmer -S English")})]
                             ;; if testing, initialize the filter with the training instances
                             (when (:testing parsed-opts)
-                              (filters/filter-apply f (load-instances :arff (file (dataset-filename datadir vocab-id term-id :title)))))
+                              (let [ds-file (file (dataset-filename datadir vocab term :title))]
+                                (filters/filter-apply f (load-instances :arff ds-file))))
                             (filters/filter-apply f ds-title))
         ds-class (dataset-set-class ds-title-fulltext 0)]
     ;; if training, save unfiltered instances to re-initialize filter later
     (when (:training parsed-opts)
-      (save-instances :arff (file (dataset-filename datadir vocab-id term-id :orig)) ds)
-      (save-instances :arff (file (dataset-filename datadir vocab-id term-id :title)) ds-title))
+      (save-instances :arff (file (dataset-filename datadir vocab term :orig)) ds)
+      (save-instances :arff (file (dataset-filename datadir vocab term :title)) ds-title))
     ds-class))
 
