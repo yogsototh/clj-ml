@@ -326,10 +326,16 @@ If the class is nominal then the string value (not keyword) is returned."
   [^Instance instance ^String val]
   (doto instance (.setClassValue val)))
 
-(defn instance-get-class
-  "Get the index of the class attribute for this instance"
+(defn instance-set-class-missing
+  "Sets the class to \"missing\""
   [^Instance instance]
-  (.classValue instance))
+  (doto instance (.setClassMissing)))
+
+(defn instance-get-class
+  "Get the class attribute for this instance; returns nil if the class is \"missing\""
+  [^Instance instance]
+  (when (not (Double/isNaN (.classValue instance)))
+    (keyword (.value (.classAttribute instance) (.classValue instance)))))
 
 (defn instance-value-at
   "Returns the value of an instance attribute. A string, not a keyword is returned."
@@ -337,11 +343,11 @@ If the class is nominal then the string value (not keyword) is returned."
   (let [pos (int pos)
         attr (.attribute instance pos)
         val (.value instance pos)]
-    (if (Double/isNaN val)
-      nil
-      (if (.isNominal attr) ; This ignores the fact that weka can have date and other attribute types...
-        (.stringValue instance pos)
-        val))))
+    ; This ignores the fact that weka can have date and other attribute types...
+    (cond (Double/isNaN val) nil
+          (.isNominal attr) (keyword (.stringValue instance pos))
+          (.isString attr) (.stringValue instance pos)
+          :else val)))
 
 (defn instance-to-list
   "Builds a list with the values of the instance"
@@ -403,10 +409,16 @@ becuase it avoids redundant string interning of the attribute names."
   [^Instances dataset index-or-name]
   (doto dataset (.setClassIndex ^int (dataset-index-attr dataset index-or-name))))
 
+(defn dataset-remove-attribute-at
+  "Removes the attribute at the specified index"
+  [^Instances dataset index]
+  (doto dataset (.deleteAttributeAt index)))
+
 (defn dataset-remove-class
   "Removes the class attribute from the dataset"
   [^Instances dataset]
-  (doto dataset (.setClassIndex -1)))
+  (let [cidx (.classIndex dataset)]
+    (if (= -1 cidx) dataset (dataset-remove-attribute-at dataset cidx))))
 
 (defn dataset-count
   "Returns the number of elements in a dataset"
