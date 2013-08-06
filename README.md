@@ -16,7 +16,7 @@ git clone the project, then run:
 
 ### Installing from Clojars
 
-    [cc.artifice/clj-ml "0.3.5"]
+    [cc.artifice/clj-ml "0.4.0-SNAPSHOT"]
 
 ### Installing from Maven
 
@@ -25,236 +25,458 @@ git clone the project, then run:
     <dependency>
       <groupId>cc.artifice</groupId>
       <artifactId>clj-ml</artifactId>
-      <version>0.3.4</version>
+      <version>0.4.0-SNAPSHOT</version>
     </dependency>
 
 ## Supported algorithms
 
  * Filters
-   * supervised discretize
-   * unsupervised discretize
-   * supervised nominal to binary
-   * unsupervised nominal to binary
-   * string to word vector
-   * reorder attributes
-   * resample (supervised, unsupervised)
+   * Discretization (supervised, unsupervised, PKI)
+   * Nominal to binary (supervised, unsupervised)
+   * Numeric to nominal
+   * String to word vector
+   * Attribute manipulation (reorder, add, remove range, remove percentage, etc.)
+   * Resample (supervised, unsupervised)
 
  * Classifiers
-   * C4.5 (J4.8)
-   * naive Bayes
-   * multilayer perceptron
-   * support vector machines
+   * k-Nearest neighbor
+   * Decision trees: C4.5/J4.8, Boosted stump, Random forest, Rotation forest, M5P
+   * Naive Bayes
+   * Multilayer perceptrons
+   * Support vector machines (grid-based training), SMO, Spegasos
 
- * Clusterers
-   * k-means
+* Regression
+   * Linear
+   * Logistic
+   * Pace
+   * Additive gradient boosting
+
+* Clusterers
+   * k-Means
+   * Cobweb
+   * Expectation-maximization
 
 ## Usage
 
-API documenation can be found [here](http://antoniogarrote.github.com/clj-ml/index.html).
+API documenation can be found [here](http://clj-ml.artifice.cc/doc/index.html).
 
 ### I/O of data
 
-    REPL>(use 'clj-ml.io)
+```clojure
+user> (use 'clj-ml.io)
+nil
 
-    REPL>; Loading data from an ARFF file, XRFF and CSV are also supported
-    REPL>(def ds (load-instances :arff "file:///Applications/weka-3-6-2/data/iris.arff"))
+user> (def ds (load-instances :arff "file:///home/josh/git/clj-ml/iris.arff"))
+#'user/ds
+user> ds
+#<Instances @relation iris
 
-    REPL>; Saving data in a different format
-    REPL>(save-instances :csv "file:///Users/antonio.garrote/Desktop/iris.csv"  ds)
+@attribute sepallength numeric
+@attribute sepalwidth numeric
+@attribute petallength numeric
+@attribute petalwidth numeric
+@attribute class {Iris-setosa,Iris-versicolor,Iris-virginica}
+
+@data
+5.1,3.5,1.4,0.2,Iris-setosa
+4.9,3,1.4,0.2,Iris-setosa
+4.7,3.2,1.3,0.2,Iris-setosa
+4.6,3.1,1.5,0.2,Iris-setosa
+5,3.6,1.4,0.2,Iris-setosa
+5.4,3.9,1.7,0.4,Iris-setosa
+4.6,3.4,1.4,0.3,Iris-setosa
+...
+
+user> (def ds (load-instances :arff "http://repository.seasr.org/Datasets/UCI/arff/iris.arff"))
+#'user/ds
+
+user> (save-instances :csv "iris.csv" ds)
+nil
+user> (println (slurp "iris.csv"))
+sepallength,sepalwidth,petallength,petalwidth,class
+5.1,3.5,1.4,0.2,Iris-setosa
+4.9,3,1.4,0.2,Iris-setosa
+4.7,3.2,1.3,0.2,Iris-setosa
+4.6,3.1,1.5,0.2,Iris-setosa
+5,3.6,1.4,0.2,Iris-setosa
+5.4,3.9,1.7,0.4,Iris-setosa
+4.6,3.4,1.4,0.3,Iris-setosa
+5,3.4,1.5,0.2,Iris-setosa
+4.4,2.9,1.4,0.2,Iris-setosa
+4.9,3.1,1.5,0.1,Iris-setosa
+5.4,3.7,1.5,0.2,Iris-setosa
+...
+
+user> (def ds (load-instances :csv "file:///home/josh/git/clj-ml/iris.csv"))
+#'user/ds
+user> ds
+#<Instances @relation stream
+
+@attribute sepallength numeric
+@attribute sepalwidth numeric
+@attribute petallength numeric
+@attribute petalwidth numeric
+@attribute class {Iris-setosa,Iris-versicolor,Iris-virginica}
+
+@data
+5.1,3.5,1.4,0.2,Iris-setosa
+4.9,3,1.4,0.2,Iris-setosa
+4.7,3.2,1.3,0.2,Iris-setosa
+4.6,3.1,1.5,0.2,Iris-setosa
+5,3.6,1.4,0.2,Iris-setosa
+5.4,3.9,1.7,0.4,Iris-setosa
+4.6,3.4,1.4,0.3,Iris-setosa
+5,3.4,1.5,0.2,Iris-setosa
+```
 
 ### Working with datasets
 
-    REPL>(use 'clj-ml.data)
+```clojure
+user> (use 'clj-ml.data)
+nil
 
-    REPL>; Defining a dataset
-    REPL>(def ds (make-dataset "name" [:length :width {:kind [:good :bad]}] [ [12 34 :good] [24 53 :bad] ]))
-    REPL>ds
+user> (def ds (make-dataset"my-name" [:length :width {:style nil} {:kind [:good :bad]}]
+                            [[12 24 "longish" :good]
+                             [8 5 "shortish" :bad]]))
+#'user/ds
+user> ds
+#<ClojureInstances @relation my-name
 
-    #<ClojureInstances @relation name
+@attribute length numeric
+@attribute width numeric
+@attribute style string
+@attribute kind {good,bad}
 
-    @attribute length numeric
-    @attribute width numeric
-    @attribute kind {good,bad}
+@data
+12,24,longish,good
+8,5,shortish,bad>
 
-    @data
-    12,34,good
-    24,53,bad>
+user> (dataset-seq ds)
+(#<Instance 12,24,longish,good> #<Instance 8,5,shortish,bad>)
 
-    REPL>; Using datasets like sequences
-    REPL>(dataset-seq ds)
+user> (map instance-to-map (dataset-seq ds))
+({:kind :good, :style "longish", :width 24.0, :length 12.0}
+{:kind :bad, :style "shortish", :width 5.0, :length 8.0})
 
-    (#<Instance 12,34,good> #<Instance 24,53,bad>)
-
-    REPL>; Transforming instances  into maps or vectors
-    REPL>(instance-to-map (first (dataset-seq ds)))
-
-    {:kind :good, :width 34.0, :length 12.0}
-
-    REPL>(instance-to-vector (dataset-at ds 0))
-    [12.0 34.0 :good]
+user> (map instance-to-vector (dataset-seq ds))
+([12.0 24.0 "longish" :good] [8.0 5.0 "shortish" :bad])
+```
 
 ### Filtering datasets
 
-    REPL>(use '(clj-ml filters io))
+```clojure
+user> (use 'clj-ml.filters 'clj-ml.io)
+nil
 
-    REPL>(def ds (load-instances :arff "file:///Applications/weka-3-6-2/data/iris.arff"))
+user> (def ds (load-instances :csv "file:///home/josh/git/clj-ml/iris.csv"))
+#'user/ds
 
-    REPL>; Discretizing a numeric attribute using an unsupervised filter
-    REPL>(def  discretize (make-filter :unsupervised-discretize {:dataset-format ds :attributes [:sepallength :petallength]}))
+user> (def discretize (make-filter :unsupervised-discretize
+                                   {:dataset-format ds
+                                    :attributes [:sepallength :petallength]}))
+#'user/discretize
 
+user> (def filtered-ds (filter-apply discretize ds))
+#'user/filtered-ds
 
-    REPL>(def filtered-ds (filter-apply discretize ds))
+user> (map instance-to-map (dataset-seq filtered-ds))
+({:class :Iris-setosa, :petalwidth 0.2, :petallength :'(-inf-1.59]',
+ :sepalwidth 3.5, :sepallength :'(5.02-5.38]'}
+{:class :Iris-setosa, :petalwidth 0.2, :petallength :'(-inf-1.59]',
+ :sepalwidth 3.0, :sepallength :'(4.66-5.02]'}
+{:class :Iris-setosa, :petalwidth 0.2, :petallength :'(-inf-1.59]',
+ :sepalwidth 3.2, :sepallength :'(4.66-5.02]'}
+{:class :Iris-setosa, :petalwidth 0.2, :petallength :'(-inf-1.59]',
+ :sepalwidth 3.1, :sepallength :'(-inf-4.66]'}
+{:class :Iris-setosa, :petalwidth 0.2, :petallength :'(-inf-1.59]',
+ :sepalwidth 3.6, :sepallength :'(4.66-5.02]'}
+...) ;; the petallength and sepallength attributes are now nominal
+```
 
-    REPL>; You can also use the filter's fn directly which will create and apply the filter:
-    REPL>(def filtered-ds (unsupervised-discretize ds {:attributes [:sepallength :petallength]}))
-    REPL>; The above way lends itself to the -> macro and is useful when using multiple filters.
+Equivalently,
 
-
-    REPL>; The eqivalent operation can be done with the ->> macro and make-apply-filter fn:
-    REPL>(def filtered-ds (->> "file:///home/kiran/Downloads/weka/weka-3-6-9/data/iris.arff"
-                            (load-instances :arff)
-                            (make-apply-filter :unsupervised-discretize {:attributes [0 2]})))
+```clojure
+user> (def filtered-ds (->> "file:///home/josh/git/clj-ml/iris.csv"
+                            (load-instances :csv)
+                            (make-apply-filter :unsupervised-discretize
+                                               {:attributes [:sepallength :petallength]})))
+```
 
 ### Using classifiers
 
-    REPL>(use 'clj-ml.classifiers)
+```clojure
+user> (use 'clj-ml.classifiers 'clj-ml.data 'clj-ml.utils)
+nil
 
-    REPL>; Building a classifier using a  C4.5 decission tree
-    REPL>(def classifier (make-classifier :decision-tree :c45))
+user> (def ds (-> (load-instances :arff "file:///home/josh/git/clj-ml/iris.arff")
+                  (dataset-set-class :class)))
+#'user/ds
 
-    REPL>; We set the class attribute for the loaded dataset
-    REPL>(dataset-set-class ds 4)
+user> (def classifier (-> (make-classifier :decision-tree :c45)
+                          (classifier-train ds)))
+#'user/classifier
 
-    REPL>; Training the classifier
-    REPL>(classifier-train classifier ds)
+user> (def instance (-> (first (dataset-seq ds))
+                        (instance-set-class-missing)))
 
-     #<J48 J48 pruned tree
-     ------------------
+user> (classifier-classify classifier instance)
+:Iris-setosa
+```
 
-     petalwidth <= 0.6: Iris-setosa (50.0)
-     petalwidth > 0.6
-     |	petalwidth <= 1.7
-     |	|   petallength <= 4.9: Iris-versicolor (48.0/1.0)
-     |	|   petallength > 4.9
-     |	|   |	petalwidth <= 1.5: Iris-virginica (3.0)
-     |	|   |	petalwidth > 1.5: Iris-versicolor (3.0/1.0)
-     |	petalwidth > 1.7: Iris-virginica (46.0/1.0)
+Evaluation:
 
-     Number of Leaves  :		5
+```clojure
+user> (def evaluation (classifier-evaluate classifier :cross-validation ds 10))
+#'user/evaluation
 
-     Size of the tree :	9
+user> (clojure.pprint/pprint (dissoc evaluation :summary :confusion-matrix))
+{:incorrect 7.0,
+ :root-relative-squared-error 36.693518966642074,
+ :sf-entropy-gain -4076.3670930399717,
+ :recall
+ {:Iris-setosa 0.9795918367346939,
+  :Iris-versicolor 0.94,
+  :Iris-virginica 0.94},
+ :kb-information 217.7935138195151,
+ :kb-relative-information 13741.240800360849,
+ :false-positive-rate
+ {:Iris-setosa 0.0,
+  :Iris-versicolor 0.04040404040404041,
+  :Iris-virginica 0.030303030303030304},
+ :percentage-correct 95.30201342281879,
+ :roc-area
+ {:Iris-setosa 0.984845423317842,
+  :Iris-versicolor 0.9456,
+  :Iris-virginica 0.9496},
+ :kb-mean-information 1.4617014350303028,
+ :percentage-unclassified 0.0,
+ :percentage-incorrect 4.697986577181208,
+ :root-mean-squared-error 0.17297908222448935,
+ :unclassified 0.0,
+ :correlation-coefficient
+ {:nan "Can't compute correlation coefficient: class is nominal!"},
+ :correct 142.0,
+ :sf-mean-entropy-gain -27.358168409664238,
+ :mean-absolute-error 0.04083212821368881,
+ :relative-absolute-error 9.187228848079984,
+ :error-rate 0.04697986577181208,
+ :kappa 0.9295222650179066,
+ :f-measure
+ {:Iris-setosa 0.9896907216494846,
+  :Iris-versicolor 0.9306930693069307,
+  :Iris-virginica 0.94},
+ :false-negative-rate
+ {:Iris-setosa 0.02040816326530612,
+  :Iris-versicolor 0.06,
+  :Iris-virginica 0.06},
+ :evaluation-object #<Evaluation weka.classifiers.Evaluation@6a7272ca>,
+ :average-cost 0.0,
+ :precision
+ {:Iris-setosa 1.0,
+  :Iris-versicolor 0.9215686274509803,
+  :Iris-virginica 0.94}}
 
+user> (println (:summary evaluation))
 
-    REPL>; We evaluate the classifier using a test dataset
-    REPL>; last parameter should be a different test dataset, here we are using the same
-    REPL>(def evaluation   (classifier-evaluate classifier  :dataset ds ds))
+Correctly Classified Instances         142               95.302  %
+Incorrectly Classified Instances         7                4.698  %
+Kappa statistic                          0.9295
+Mean absolute error                      0.0408
+Root mean squared error                  0.173 
+Relative absolute error                  9.1872 %
+Root relative squared error             36.6935 %
+Total Number of Instances              149     
+Ignored Class Unknown Instances                  1     
 
-     === Confusion Matrix ===
+nil
+user> (println (:confusion-matrix evaluation))
+=== Confusion Matrix ===
 
-       a	 b  c	<-- classified as
-      50	 0  0 |	 a = Iris-setosa
-       0 49  1 |	 b = Iris-versicolor
-       0	 2 48 |	 c = Iris-virginica
+  a  b  c   <-- classified as
+ 48  1  0 |  a = Iris-setosa
+  0 47  3 |  b = Iris-versicolor
+  0  3 47 |  c = Iris-virginica
 
-     === Summary ===
+nil
+```
+Saving and restoring (trained) classifiers:
 
-     Correctly Classified Instances	   147		     98	     %
-     Incorrectly Classified Instances	     3		      2	     %
-     Kappa statistic			     0.97
-     Mean absolute error			     0.0233
-     Root mean squared error		     0.108
-     Relative absolute error		     5.2482 %
-     Root relative squared error		    22.9089 %
-     Total Number of Instances		   150
+```clojure
 
-    REPL>(:kappa evaluation)
+user> (serialize-to-file classifier "my-classifier.bin")
+"my-classifier.bin"
 
-     0.97
+user> (def classifier2 (deserialize-from-file "my-classifier.bin"))
+#'user/classifier2
 
-    REPL>(:root-mean-squared-error e)
+user> (classifier-classify classifier2 instance)
+:Iris-setosa
+```
 
-     0.10799370769526968
+Text document handling:
 
-    REPL>(:precision e)
+```clojure
+user> (def docs [{:title "Document title 1"
+                  :fulltext "This is the fulltext..."
+                  :terms {"Topic" ["Sports"]}}
+                 {:title "Another document title"
+                  :fulltext "Some more \"fulltext\"; rabbit artificial machine bananas"
+                  :terms {"Topic" ["Politics" "Food"]}}])
+#'user/docs
 
-     {:Iris-setosa 1.0, :Iris-versicolor 0.9607843137254902, :Iris-virginica
-      0.9795918367346939}
+user> (docs-to-dataset docs "Topic" "Sports" 1 "/tmp" :stemmer true :lowercase false)
+#<Instances @relation 'docs-weka.filters.unsupervised.attribute.StringToWordVector...'
 
-    REPL>; The classifier can also be evaluated using cross-validation
-    REPL>(classifier-evaluate classifier :cross-validation ds 10)
+@attribute class {no,yes}
+@attribute title-1 numeric
+@attribute title-Another numeric
+@attribute title-Document numeric
+@attribute title-document numeric
+@attribute title-titl numeric
+@attribute fulltext-Some numeric
+@attribute fulltext-This numeric
+@attribute fulltext-artifici numeric
+@attribute fulltext-banana numeric
+@attribute fulltext-fulltext numeric
+@attribute fulltext-is numeric
+@attribute fulltext-machin numeric
+@attribute fulltext-more numeric
+@attribute fulltext-rabbit numeric
+@attribute fulltext-the numeric
 
-     === Confusion Matrix ===
+@data
+{0 yes,1 0.480453,3 0.480453,7 0.480453,11 0.480453,15 0.480453}
+{2 0.480453,4 0.480453,6 0.480453,8 0.480453,9 0.480453,12 0.480453,13 0.480453,14 0.480453}>
+user>
+```
 
-       a	 b  c	<-- classified as
-      49	 1  0 |	 a = Iris-setosa
-       0 47  3 |	 b = Iris-versicolor
-       0	 4 46 |	 c = Iris-virginica
+Words appearing in the dataset will only be those appearing in the
+documents (or a subset; by default, the most common 1000 words). This
+presents a problem when new documents are loaded and used in a
+classifier trained on other documents. The classifier will not know
+how to handle word attributes that are not present in the training
+set.
 
-     === Summary ===
+The `docs-to-dataset` function provides the ability to save the
+training documents dataset and "filter" the testing documents through
+this dataset to ensure the same word attributes are extracted for both
+sets. The following example shows that the words "foo, bar, baz, quux"
+are ignored in the new (testing) documents, and all the original
+attributes in the training dataset are retained.
 
-     Correctly Classified Instances	   142		     94.6667 %
-     Incorrectly Classified Instances	     8		      5.3333 %
-     Kappa statistic			     0.92
-     Mean absolute error			     0.0452
-     Root mean squared error		     0.1892
-     Relative absolute error		    10.1707 %
-     Root relative squared error		    40.1278 %
-     Total Number of Instances		   150
+```clojure
+user> (docs-to-dataset docs "Topic" "Sports" 1 "/tmp"
+                       :stemmer true :lowercase false :training true)
+#<Instances @relation 'docs-weka.filters.unsupervised.attribute.StringToWordVector...'
 
-    REPL>; A trained classifier can be used to classify new instances
-    REPL>(def to-classify (make-instance ds
-                                                      {:class :Iris-versicolor,
-                                                      :petalwidth 0.2,
-                                                      :petallength 1.4,
-                                                      :sepalwidth 3.5,
-                                                      :sepallength 5.1}))
-    REPL>(classifier-classify classifier to-classify)
+@attribute class {no,yes}
+@attribute title-1 numeric
+@attribute title-Another numeric
+@attribute title-Document numeric
+@attribute title-document numeric
+@attribute title-titl numeric
+@attribute fulltext-Some numeric
+@attribute fulltext-This numeric
+@attribute fulltext-artifici numeric
+@attribute fulltext-banana numeric
+@attribute fulltext-fulltext numeric
+@attribute fulltext-is numeric
+@attribute fulltext-machin numeric
+@attribute fulltext-more numeric
+@attribute fulltext-rabbit numeric
+@attribute fulltext-the numeric
 
-     0.0
+@data
+{2 0.480453,4 0.480453,6 0.480453,8 0.480453,9 0.480453,12 0.480453,13 0.480453,14 0.480453}
+{0 yes,1 0.480453,3 0.480453,7 0.480453,11 0.480453,15 0.480453}>
 
-    REPL>(classifier-label classifier to-classify)
+user> (def docs2 [{:title "Document title 1 foo bar"
+                   :fulltext "baz rabbit quux"
+                   :terms {"Topic" ["Sports"]}}])
+#'user/docs2
 
-     #<Instance 5.1,3.5,1.4,0.2,Iris-setosa>
+user> (docs-to-dataset docs2 "Topic" "Sports" 1 "/tmp"
+                       :stemmer true :lowercase false :testing true)
+#<Instances @relation 'docs-weka.filters.unsupervised.attribute.StringToWordVector...'
 
+@attribute class {no,yes}
+@attribute title-1 numeric
+@attribute title-Another numeric
+@attribute title-Document numeric
+@attribute title-document numeric
+@attribute title-titl numeric
+@attribute fulltext-Some numeric
+@attribute fulltext-This numeric
+@attribute fulltext-artifici numeric
+@attribute fulltext-banana numeric
+@attribute fulltext-fulltext numeric
+@attribute fulltext-is numeric
+@attribute fulltext-machin numeric
+@attribute fulltext-more numeric
+@attribute fulltext-rabbit numeric
+@attribute fulltext-the numeric
 
-    REPL>; The classifiers can be saved and restored later
-    REPL>(use 'clj-ml.utils)
-
-    REPL>(serialize-to-file classifier "/Users/antonio.garrote/Desktop/classifier.bin")
+@data
+{0 yes,1 0.480453,3 0.480453,14 0.480453}>
+user> 
+```
 
 ### Using clusterers
 
-    REPL>(use 'clj-ml.clusterers)
+```clojure
+user> (use 'clj-ml.clusterers)
+nil
 
-    REPL> ; we build a clusterer using k-means and three clusters
-    REPL> (def kmeans (make-clusterer :k-means {:number-clusters 3}))
+user> (def ds (-> (load-instances :arff "file:///home/josh/git/clj-ml/iris.arff")
+                  (dataset-remove-attribute-at 4)))
+#'user/ds
+user> ds
+#<Instances @relation iris
 
-    REPL> ; we need to remove the class from the dataset to
-    REPL> ; use this clustering algorithm
-    REPL> (dataset-remove-class ds)
+@attribute sepallength numeric
+@attribute sepalwidth numeric
+@attribute petallength numeric
+@attribute petalwidth numeric
 
-    REPL> ; we build the clusters
-    REPL> (clusterer-build kmeans ds)
-    REPL> kmeans
+@data
+5.1,3.5,1.4,0.2
+4.9,3,1.4,0.2
+4.7,3.2,1.3,0.2
+4.6,3.1,1.5,0.2
+5,3.6,1.4,0.2
+5.4,3.9,1.7,0.4
+4.6,3.4,1.4,0.3
+...
 
-      #<SimpleKMeans
-      kMeans
-      ======
+user> (def clusterer (make-clusterer :k-means {:number-clusters 3}))
+#'user/clusterer
 
-      Number of iterations: 3
-      Within cluster sum of squared errors: 7.817456892309574
-      Missing values globally replaced with mean/mode
+user> (clusterer-build clusterer ds)
+nil
 
-      Cluster centroids:
-                                                Cluster#
-      Attribute                Full Data               0               1               2
-                                   (150)            (50)            (50)            (50)
-      ==================================================================================
-      sepallength                 5.8433           5.936           5.006           6.588
-      sepalwidth                   3.054            2.77           3.418           2.974
-      petallength                 3.7587            4.26           1.464           5.552
-      petalwidth                  1.1987           1.326           0.244           2.026
-      class                  Iris-setosa Iris-versicolor     Iris-setosa  Iris-virginica
+user> clusterer
+#<SimpleKMeans 
+kMeans
+======
+
+Number of iterations: 6
+Within cluster sum of squared errors: 6.998114004826762
+Missing values globally replaced with mean/mode
+
+Cluster centroids:
+                           Cluster#
+Attribute      Full Data          0          1          2
+                   (150)       (61)       (50)       (39)
+=========================================================
+sepallength       5.8433     5.8885      5.006     6.8462
+sepalwidth         3.054     2.7377      3.418     3.0821
+petallength       3.7587     4.3967      1.464     5.7026
+petalwidth        1.1987      1.418      0.244     2.0795
+
+
+>
+user> 
+```
 
 ## Thanks YourKit!
 
