@@ -704,39 +704,16 @@
 ;; Classifying instances
 
 (defn classifier-classify
-  "Classifies an instance using the provided classifier.
-   The value returned is the numeric attribute of that value for
-   the list of valid values for the class."
+  "Classifies an instance using the provided classifier. Returns the
+   class as a keyword."
   ([^Classifier classifier ^Instance instance]
-     (.classifyInstance classifier instance)))
+     (let [pred (.classifyInstance classifier instance)]
+       (keyword (.value (.classAttribute instance) pred)))))
 
 (defn classifier-label
   "Classifies and assign a label to a dataset instance.
-   This function is similar to classifier-classify but
-   instead of just returning the numeric identifier for the
-   new instance, it changes the class value for that instance
-   to the newly assigned by the classifier.
-
-   The function returns the newly classified instance.
-
-   This call is destructive, the instance passed as an argument
-   is modified.
-
-    ; We create the instance to classify
-    (def *to-classify* (make-instance *dataset*  {:class :Iris-versicolor
-                                                  :petalwidth 0.2
-                                                  :petallength 1.4
-                                                  :sepalwidth 3.5
-                                                  :sepallength 5.1}))
-
-    ; We use the classifier to check the value for the class
-    (classifier-classify *classifier* *to-classify*)
-     >0.0
-
-    ; We change the class for the instance according to the assigned class
-    (classifier-label *classifier* *to-classify*)
-     >#<Instance 5.1,3.5,1.4,0.2,Iris-setosa>
-"
-  ([classifier instance]
-     (let [cls (classifier-classify classifier instance)]
-       (instance-set-class instance cls))))
+   The function returns the newly classified instance. This call is
+   destructive, the instance passed as an argument is modified."
+  ([^Classifier classifier ^Instance instance]
+     (let [cls (.classifyInstance classifier instance)]
+       (doto instance (.setClassValue cls)))))
