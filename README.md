@@ -6,7 +6,7 @@ A machine learning library for Clojure built on top of Weka and friends.
 
 ### Installing from Clojars
 
-    [cc.artifice/clj-ml "0.4.0-SNAPSHOT"]
+    [cc.artifice/clj-ml "0.4.0"]
 
 ### Installing from Maven
 
@@ -15,7 +15,7 @@ A machine learning library for Clojure built on top of Weka and friends.
     <dependency>
       <groupId>cc.artifice</groupId>
       <artifactId>clj-ml</artifactId>
-      <version>0.4.0-SNAPSHOT</version>
+      <version>0.4.0</version>
     </dependency>
 
 ## Supported algorithms
