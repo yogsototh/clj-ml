@@ -206,6 +206,12 @@
 
 (deffilter resample-supervised)
 
+(defmethod make-filter-options :replace-missing-values
+  ([kind m]
+     (check-options m {:unset-class-temporarily "-unset-class-temporarily"})))
+
+(deffilter replace-missing-values)
+
 (defmethod make-filter-options :select-append-attributes
   ([kind m]
      (->> (extract-attributes m)
@@ -245,6 +251,7 @@
    :resample-unsupervised weka.filters.unsupervised.instance.Resample
    :resample-supervised weka.filters.supervised.instance.Resample
    :select-append-attributes weka.filters.unsupervised.attribute.Copy
+   :replace-missing-values weka.filters.unsupervised.attribute.ReplaceMissingValues
    :project-attributes weka.filters.unsupervised.attribute.Remove})
 
 
@@ -269,6 +276,7 @@
      - :resample-unsupervised
      - :resample-supervised
      - :select-append-attributes
+     - :replace-missing-values
      - :project-attributes
      - :clj-streamable
      - :clj-batch
@@ -377,6 +385,7 @@
       Parameters:
 
         - :attributes
+
             Index of the attributes to be transformed. Sample value: [0 1 2]
             The attributes may also be specified by names as well: [:some-name, \"another-name\"]
         - :invert
@@ -507,6 +516,17 @@
             The attributes may also be specified by names as well: [:some-name, \"another-name\"]
         - :invert
             Invert the selection of the columns. Sample value: true
+
+    * :replace-missing-values
+
+      Replaces all missing values for nominal and numeric attributes
+      in a dataset with the modes and means from the training data.
+
+      Parameters:
+
+        - :unset-class-temporarily
+            Unsets the class index temporarily before the filter is
+            applied to the data. Sample value: true; default: false
 
     * :project-attributes
 

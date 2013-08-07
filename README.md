@@ -27,6 +27,7 @@ A machine learning library for Clojure built on top of Weka and friends.
    * String to word vector
    * Attribute manipulation (reorder, add, remove range, remove percentage, etc.)
    * Resample (supervised, unsupervised)
+   * Replace missing values with mean (numeric attributes) or mode (nominal attributes)
 
  * Classifiers
    * k-Nearest neighbor
@@ -550,6 +551,8 @@ user> titanicds
 ...
 >
 
+user> (def titanicds (make-apply-filter :replace-missing-values {} titanicds))
+
 user> (def titanicds (make-apply-filter :remove-attributes
                                         {:attributes [:PassengerId :Name :Ticket :Cabin]}
                                         titanicds))
@@ -621,6 +624,7 @@ user> titanic-test-passids
 user> (def titanic-testds (->> titanic-testds
                                (make-apply-filter :remove-attributes
                                                   {:attributes [:PassengerId :Name :Ticket :Cabin]})
+                               (make-apply-filter :replace-missing-values {})
                                (make-apply-filter :add-attribute
                                                   {:type :nominal :name :Survived
                                                    :column 0 :labels ["0" "1"]})))
