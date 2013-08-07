@@ -139,11 +139,11 @@
 (deftest working-sequences-and-helpers
   (let [ds (make-dataset "test" [:a :b {:c [:d :e]}] [{:a 1 :b 2 :c nil} [4 nil :e]])]
     (is (= 2 (dataset-count ds)))
-    (is (= [{:a 1.0 :b 2.0 :c nil} {:a 4.0 :b nil :c "e"}] (dataset-as-maps ds)))
+    (is (= [{:a 1.0 :b 2.0 :c nil} {:a 4.0 :b nil :c :e}] (dataset-as-maps ds)))
     (is (= [{:weight 1.0} {:weight 1.0}] (map meta (dataset-as-maps ds))))
-    (is (= [[1.0 2.0 nil] [4.0 nil "e"]] (dataset-as-vecs ds)))
+    (is (= [[1.0 2.0 nil] [4.0 nil :e]] (dataset-as-vecs ds)))
     (is (= [{:weight 1.0} {:weight 1.0}] (map #(meta (instance-to-map %1)) (dataset-seq ds))))
-    (is (= [{:a 1.0 :b 2.0 :c nil} {:a 4.0 :b nil :c "e"}] (map #(instance-to-map %1) (dataset-seq ds))))))
+    (is (= [{:a 1.0 :b 2.0 :c nil} {:a 4.0 :b nil :c :e}] (map #(instance-to-map %1) (dataset-seq ds))))))
 
 (deftest dataset-instance-predicates
   (let [ds (make-dataset "test" [:a :b {:c [:d :e]}] [{:a 1 :b 2 :c :d} [4 5 :e]])
@@ -228,4 +228,4 @@
                           [2 :bar]
                           [3 :bar]
                           [4 :foo]])]
-    (is (= (dataset-as-vecs (take-dataset ds 2)) [[1.0 "foo"] [2.0 "bar"]]))))
+    (is (= (dataset-as-vecs (take-dataset ds 2)) [[1.0 :foo] [2.0 :bar]]))))

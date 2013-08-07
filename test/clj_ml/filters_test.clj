@@ -183,8 +183,10 @@
                                                 {:attributes [0] :counts true :lowercase true
                                                  :stemmer "weka.core.stemmers.SnowballStemmer -S English"}
                                                 ds)))
-           '({:world 1.0, :this 0.0, :test 1.0, :is 0.0, :hello 1.0, :dog 1.0, :cat 1.0, :a 0.0, :class "no"}
-             {:world 1.0, :this 1.0, :test 1.0, :is 2.0, :hello 0.0, :dog 0.0, :cat 0.0, :a 2.0, :class "yes"})))))
+           '({:world 1.0, :this 0.0, :test 1.0, :is 0.0, :hello 1.0,
+              :dog 1.0, :cat 1.0, :a 0.0, :class :no}
+             {:world 1.0, :this 1.0, :test 1.0, :is 2.0, :hello 0.0,
+              :dog 0.0, :cat 0.0, :a 2.0, :class :yes})))))
 
 (deftest make-apply-filter-add-attribute
   (let [ds (make-dataset :test [:a :b {:c [:g :m]}]
@@ -256,9 +258,9 @@
                                {:process inc-nums
                                 :determine-dataset-format rename-attributes} ds)]
     (is (= (map instance-to-map (dataset-seq res))
-           [{:foo 2.0 :bar 3.0 :c "g"}
-            {:foo 3.0 :bar 5.0 :c "m"}
-            {:foo 5.0 :bar 9.0 :c "g"}]))))
+           [{:foo 2.0 :bar 3.0 :c :g}
+            {:foo 3.0 :bar 5.0 :c :m}
+            {:foo 5.0 :bar 9.0 :c :g}]))))
 
 
 (deftest make-apply-filter-clj-batch
