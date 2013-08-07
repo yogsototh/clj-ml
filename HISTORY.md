@@ -1,5 +1,38 @@
 # clj-ml History
 
+## v0.4.0 - 2013-08-07
+
+Supported algorithms:
+
+ * Filters
+   * Discretization (supervised, unsupervised, PKI)
+   * Nominal to binary (supervised, unsupervised)
+   * Numeric to nominal
+   * String to word vector
+   * Attribute manipulation (reorder, add, remove range, remove percentage, etc.)
+   * Resample (supervised, unsupervised)
+   * Replace missing values with mean (numeric attributes) or mode (nominal attributes)
+
+ * Classifiers
+   * k-Nearest neighbor
+   * Decision trees: C4.5/J4.8, Boosted stump, Random forest, Rotation forest, M5P
+   * Naive Bayes
+   * Multilayer perceptrons
+   * Support vector machines (grid-based training), SMO, Spegasos
+
+ * Regression
+   * Linear
+   * Logistic
+   * Pace
+   * Additive gradient boosting
+
+ * Clusterers
+   * k-Means
+   * Cobweb
+   * Expectation-maximization
+
+# Older clj-ml History
+
 ## v0.2.5 - 2013-01-04
 
  * Upgraaded to clojure 1.4 and lein2.
