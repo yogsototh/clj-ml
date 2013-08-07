@@ -492,6 +492,64 @@ user> clustered-ds
 ...
 ```
 
+## Example: Home price prediction
+
+http://www.ibm.com/developerworks/library/os-weka1/
+
+```clojure
+user> (def homes (make-dataset "homes" [:house-size :lot-size :bedrooms
+                                        :granite :bathroom :sellingPrice]
+                               [[3529, 9191, 6, 0, 0, 205000]
+                                [3247, 10061, 5, 1, 1, 224900]
+                                [4032, 10150, 5, 0, 1, 197900]
+                                [2397, 14156, 4, 1, 0,189900]
+                                [2200, 9600, 4, 0, 1, 195000] 
+                                [3536, 19994, 6, 1, 1,325000] 
+                                [2983, 9365, 5, 0, 1, 230000]]))
+#'user/homes
+
+user> (def homes (dataset-set-class homes :sellingPrice))
+#'user/homes
+
+user> homes
+#<ClojureInstances @relation homes
+
+@attribute house-size numeric
+@attribute lot-size numeric
+@attribute bedrooms numeric
+@attribute granite numeric
+@attribute bathroom numeric
+@attribute sellingPrice numeric
+
+@data
+3529,9191,6,0,0,205000
+3247,10061,5,1,1,224900
+4032,10150,5,0,1,197900
+2397,14156,4,1,0,189900
+2200,9600,4,0,1,195000
+3536,19994,6,1,1,325000
+2983,9365,5,0,1,230000>
+
+user> (def reg (classifier-train (make-classifier :regression :linear) homes))
+#'user/reg
+
+user> reg
+#<LinearRegression 
+Linear Regression Model
+
+sellingPrice =
+
+    -26.6882 * house-size +
+      7.0551 * lot-size +
+  43166.0767 * bedrooms +
+  42292.0901 * bathroom +
+ -21661.1208>
+user> 
+
+user> (classifier-predict-numeric reg (make-instance homes [3198, 9669, 5, 1, 1, nil]))
+219328.35717359098
+```
+
 ## Example: Predicting survival on the Titanic
 
 https://www.kaggle.com/c/titanic-gettingStarted

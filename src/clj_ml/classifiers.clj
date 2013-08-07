@@ -710,6 +710,13 @@
      (let [pred (.classifyInstance classifier instance)]
        (keyword (.value (.classAttribute instance) pred)))))
 
+(defn classifier-predict-numeric
+  "Predicts the class attribute of an instance using the provided
+   classifier. Returns the value as a floating-point value (e.g., for
+   regression)."
+  ([^Classifier classifier ^Instance instance]
+     (.classifyInstance classifier instance)))
+
 (defn classifier-label
   "Classifies and assign a label to a dataset instance.
    The function returns the newly classified instance. This call is
