@@ -62,7 +62,6 @@
 "
   (:use [clj-ml utils data kernel-functions options-utils])
   (:import (java.util Date Random)
-           (hr.irb.fastRandomForest FastRandomForest)
            (weka.core Instance Instances)
            (weka.classifiers.lazy IBk)
            (weka.classifiers.trees J48 RandomForest M5P)
@@ -232,16 +231,6 @@
                                 :shrinkage-parameter "-H"}))))
 
 (defmethod make-classifier-options [:decision-tree :random-forest]
-  ([kind algorithm m]
-     (->>
-      (check-options m {:debug "-D"})
-      (check-option-values m
-                           {:num-trees-in-forest "-I"
-                            :num-features-to-consider "-K"
-                            :random-seed "-S"
-                            :depth "-depth"}))))
-
-(defmethod make-classifier-options [:decision-tree :fast-random-forest]
   ([kind algorithm m]
      (->>
       (check-options m {:debug "-D"})
@@ -535,10 +524,6 @@
 (defmethod make-classifier [:decision-tree :random-forest]
   ([kind algorithm & options]
      (make-classifier-with kind algorithm RandomForest options)))
-
-(defmethod make-classifier [:decision-tree :fast-random-forest]
-  ([kind algorithm & options]
-     (make-classifier-with kind algorithm FastRandomForest options)))
 
 (defmethod make-classifier [:decision-tree :rotation-forest]
   ([kind algorithm & options]

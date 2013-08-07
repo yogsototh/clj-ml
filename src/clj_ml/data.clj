@@ -16,7 +16,6 @@
   (:require [clojure.string :as str])
   (:require [clojure.set :as set])
   (:use [clojure.java.io :only [file]])
-  (:import [org.jsoup Jsoup])
   (:import (weka.core Instance Instances FastVector Attribute)
            (cljml ClojureInstances)))
 
@@ -535,7 +534,7 @@ split immediately you can use do-split-dataset."
         ds (make-dataset
             :docs [{:class [:no :yes]} {:title nil} {:fulltext nil}]
             (for [doc docs-keep-n]
-              (let [orig-fulltext (.text (Jsoup/parse (or (:fulltext doc) (:extracted doc) "")))
+              (let [orig-fulltext (:fulltext doc "")
                     fulltext (str/replace orig-fulltext #"\s+" " ")
                     fulltext-fixed (str/replace fulltext #"[^ \w\d]" "")
                     title (str/replace (:title doc "") #"[^ \w\d]" "")
