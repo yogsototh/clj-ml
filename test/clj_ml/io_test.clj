@@ -1,4 +1,5 @@
 (ns clj-ml.io-test
+  (:require [clojure.string :as str])
   (:use [clj-ml io data] :reload-all)
   (:use clojure.test midje.sweet))
 
@@ -13,21 +14,9 @@
 (deftest test-save-instances
   (let [ds (make-dataset "test" [:a :b {:c [:m :n]}] [[1 2 :m] [4 5 :m]])]
     (is (= (do (save-instances :csv "test.csv" ds)
-               (slurp "test.csv"))
-           "a,b,c
-1,2,m
-4,5,m
-"))
+               (str/replace (slurp "test.csv") #"\r\n" "\n"))
+           "a,b,c\n1,2,m\n4,5,m\n"))
     (is (= (do (save-instances :arff "test.arff" ds)
-               (slurp "test.arff"))
-           "@relation test
-
-@attribute a numeric
-@attribute b numeric
-@attribute c {m,n}
-
-@data
-1,2,m
-4,5,m
-"))))
+               (str/replace (slurp "test.arff") #"\r\n" "\n"))
+           "@relation test\n\n@attribute a numeric\n@attribute b numeric\n@attribute c {m,n}\n\n@data\n1,2,m\n4,5,m\n"))))
 
