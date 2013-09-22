@@ -4,11 +4,13 @@
   (:use clojure.test midje.sweet))
 
 (deftest test-load-instances-iris-arff-url
-  (let [ds (load-instances :arff "http://repository.seasr.org/Datasets/UCI/arff/iris.arff")]
+  (let [ds (do (println "Loading instances from http://clj-ml.artifice.cc/iris.arff ...")
+               (load-instances :arff "http://clj-ml.artifice.cc/iris.arff"))]
     (is (= 150 (dataset-count ds)))))
 
 (deftest test-load-instances-iris-csv-url
-  (let [ds (load-instances :csv "https://raw.github.com/bigmlcom/bigmler/master/data/iris.csv")]
+  (let [ds (do (println "Loading instances from http://clj-ml.artifice.cc/iris.csv ...")
+               (load-instances :csv "http://clj-ml.artifice.cc/iris.csv"))]
     (is (= 150 (dataset-count ds)))))
 
 (deftest test-save-instances
