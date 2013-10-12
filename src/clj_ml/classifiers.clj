@@ -378,7 +378,7 @@
             filter in clj-ml.filters/make-filter function). Default value: false
         - :no-numeric-normalization
             A numeric class will not be normalized. Default value: false
-        - :no-nomalization
+        - :no-normalization
             No attribute will be normalized. Default value: false
         - :no-reset
             Reseting the network will not be allowed. Default value: false
