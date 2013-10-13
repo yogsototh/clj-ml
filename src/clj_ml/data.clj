@@ -523,6 +523,8 @@ split immediately you can use do-split-dataset."
 (defn docs-to-dataset
   [docs vocab term keep-n datadir & opts]
   (let [parsed-opts (apply hash-map opts)
+        original-ordering (map :id docs)
+        docid-map (into {} (for [doc docs] [(:id doc) doc]))
         docs-with-term (filter (fn [doc] (some #{term} (get-in doc [:terms vocab]))) docs)
         docs-without-term (let [dwt (filter (fn [doc] (not-any? #{term} (get-in doc [:terms vocab]))) docs)]
                             (if (:resample parsed-opts)
@@ -531,9 +533,10 @@ split immediately you can use do-split-dataset."
         docs-keep-n (if keep-n (concat (take (/ keep-n 2) docs-with-term)
                                        (take (/ keep-n 2) docs-without-term))
                         (concat docs-with-term docs-without-term))
+        docs-ordered (for [docid original-ordering] (docid-map docid))
         ds (make-dataset
             :docs [{:class [:no :yes]} {:title nil} {:fulltext nil}]
-            (for [doc docs-keep-n]
+            (for [doc docs-ordered]
               (let [orig-fulltext (:fulltext doc "")
                     fulltext (str/replace orig-fulltext #"\s+" " ")
                     fulltext-fixed (str/replace fulltext #"[^ \w\d]" "")
