@@ -524,13 +524,13 @@ split immediately you can use do-split-dataset."
   [docs vocab term keep-n datadir & opts]
   (let [parsed-opts (apply hash-map opts)
         docs-with-term (filter (fn [doc] (some #{term} (get-in doc [:terms vocab]))) docs)
-        docs-without-term (let [dwt (set/difference (set docs) (set docs-with-term))]
+        docs-without-term (let [dwt (filter (fn [doc] (not-any? #{term} (get-in doc [:terms vocab]))) docs)]
                             (if (:resample parsed-opts)
                               (take (count docs-with-term) dwt)
                               dwt))
-        docs-keep-n (shuffle (if keep-n (concat (take (/ keep-n 2) docs-with-term)
-                                                (take (/ keep-n 2) docs-without-term))
-                                 (concat docs-with-term docs-without-term)))
+        docs-keep-n (if keep-n (concat (take (/ keep-n 2) docs-with-term)
+                                       (take (/ keep-n 2) docs-without-term))
+                        (concat docs-with-term docs-without-term))
         ds (make-dataset
             :docs [{:class [:no :yes]} {:title nil} {:fulltext nil}]
             (for [doc docs-keep-n]
