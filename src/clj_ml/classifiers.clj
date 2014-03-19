@@ -68,7 +68,7 @@
            (weka.classifiers.meta LogitBoost AdditiveRegression RotationForest)
            (weka.classifiers.bayes NaiveBayes NaiveBayesUpdateable)
            (weka.classifiers.functions MultilayerPerceptron SMO LinearRegression Logistic PaceRegression SPegasos LibSVM)
-           (weka.classifiers Classifier Evaluation)))
+           (weka.classifiers AbstractClassifier Classifier Evaluation)))
 
 
 ;; Setting up classifier options
@@ -544,7 +544,7 @@
 (defn classifier-copy
   "Performs a deep copy of the classifier"
   [^Classifier classifier]
-  (Classifier/makeCopy classifier))
+  (AbstractClassifier/makeCopy classifier))
 
 (defn classifier-copy-and-train
   "Performs a deep copy of the classifier, trains the copy, and returns it."

@@ -7,8 +7,7 @@
                               [:a :b]
                               1)
         inst (make-instance dataset [1 2])]
-    (is (= (class inst)
-           weka.core.Instance))
+    (is (instance? weka.core.Instance inst))
     (is (= 2 (.numValues inst)))
     (is (= 1.0 (.value inst 0)))
     (is (= 2.0 (.value inst 1)))))
@@ -18,8 +17,7 @@
                               [:a {:b [:b1 :b2]}]
                               1)
         inst (make-instance dataset [1 :b1])]
-    (is (= (class inst)
-           weka.core.Instance))
+    (is (instance? weka.core.Instance inst))
     (is (= 2 (.numValues inst)))
     (is (= 1.0 (.value inst 0)))
     (is (= "b1" (.stringValue inst 1)))))
@@ -29,8 +27,7 @@
                               [:a :b]
                               1)
         inst (make-instance dataset [1 nil])]
-    (is (= (class inst)
-           weka.core.Instance))
+    (is (instance? weka.core.Instance inst))
     (is (= 2 (.numValues inst)))
     (is (= 1.0 (.value inst 0)))
     (is (Double/isNaN (.value inst 1)))))
