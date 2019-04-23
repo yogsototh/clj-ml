@@ -1,3 +1,12 @@
+> This project has two homes.
+> It is ok to work in github, still, for a better decentralized web
+> please consider contributing (issues, PR, etc...) throught:
+>
+> https://gitlab.esy.fun/yogsototh/clj-ml
+
+---
+
+
 # clj-ml
 
 A machine learning library for Clojure built on top of Weka and friends.
